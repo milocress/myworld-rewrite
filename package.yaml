@@ -1,0 +1,79 @@
+name:                myworld
+version:             0.1.0.0
+github:              "githubuser/myworld"
+license:             BSD3
+author:              "Milo Cress"
+maintainer:          "milocress@cvsdvt.org"
+copyright:           "2018 Milo Cress"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            Procedural planet generation and geographical simulation on a wide range of spatial and temporal scales.
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/myworld#readme>
+
+dependencies:
+- base
+- mtl
+- linear
+- vector
+- recursion-schemes
+- containers
+- repa
+- JuicyPixels
+- accelerate
+  #- linear-accelerate
+  #- accelerate-llvm-native
+  #- accelerate-llvm-ptx
+
+library:
+  source-dirs: src
+
+executables:
+  myworld-exe:
+    main:                Main.hs
+    source-dirs:         app/Main/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - myworld
+
+  mandelbrot-exe:
+    main:                Main.hs
+    source-dirs:         app/Mandelbrot/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - myworld
+
+  engine-exe:
+    main:                Main.hs
+    source-dirs:         app/Engine/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - myworld
+
+tests:
+  myworld-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - myworld
