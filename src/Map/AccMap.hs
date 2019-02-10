@@ -1,104 +1,48 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
--- {-# LANGUAGE DataKinds #-}
--- {-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE FlexibleInstances #-}
--- {-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE UndecidableInstances #-}
--- {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TypeInType #-}
--- {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
-
 ------------------------------------------------------
 -- |
 -- Module : RepaMap
 -- Maintainer : Milo Cress
 -- Stability : Lol
--- Portability : portable
+-- Portability : not very
 --
 -- Internal Representation of Maps that can turn into Repa arrays.
 ------------------------------------------------------
-module Map.AccMap where
+module Map.AccMap (bakeMap2) where
 
--- import Data.Foldable
-import qualified Data.Array.Accelerate as A
-import qualified Data.Array.Accelerate.Array.Sugar as A
-import qualified Data.Array.Accelerate.Interpreter as I
--- import qualified Data.Array.Accelerate.LLVM.PTX as GPU
-import Control.Monad.Identity
+import Data.Array.Accelerate                 as A
+import Data.Array.Accelerate.IO              as A
+import Data.Array.Accelerate.Data.Colour.RGB as A
+import Data.Array.Accelerate.LLVM.PTX (run)
 
-import Linear.V
-import GHC.TypeLits
-import Data.Vector as V
--- import Data.Proxy
+import qualified Prelude as P
 
-import Map
--- import SectorMap
--- import Sector
--- import Transform
-import Map.Dimension
+import Linear.V (V, fromV, toV)
+import Linear.V2 (V2 (..))
 
-type AccMapT sh m a = MapT (A.Exp sh) m (A.Exp a)
-type AccMap  sh   a = AccMapT sh Identity a
+import Map (runMap, getPoint, mapMap, Map)
+import Map.Dimension (Resolution)
+import Map.SectorMap (DimensionalMap)
 
-runAccMapT :: (A.Shape sh) => AccMapT sh m a -> A.Exp sh -> m (A.Exp a)
-runAccMapT = runMapT
+resToSh :: V 2 P.Int -> DIM2
+resToSh (fromV -> V2 x y) = Z :. x :. y
 
-runAccMap :: (A.Shape sh) => AccMap sh a -> A.Exp sh -> A.Exp a
-runAccMap = runMap
+-- resToShE :: V 2 (Exp P.Int) -> Exp DIM2
+-- resToShE (fromV -> V2 x y) = lift (Z :. x :. y)
 
+shToV :: (FromIntegral P.Int a, P.Num a) => Exp DIM2 -> V 2 (Exp a)
+shToV (unlift -> Z :. x :. y) = toV $ V2 (fromIntegral x) (fromIntegral y)
 
-toAcc :: ( A.Shape sh
-         , A.Elt   a)
-      => sh
-      -> AccMap sh a
-      -> A.Acc (A.Array sh a)
-toAcc sh m = A.generate (A.constant sh) $ runAccMap m
+bakeMap2 :: (Elt a, FromIntegral Int c, P.Num c) => Resolution 2 -> DimensionalMap 2 (Exp c) (Exp a) -> Array DIM2 a
+bakeMap2 r m = run . generate (constant $ resToSh r) . runMap $ do
+  p <- shToV P.<$> getPoint
+  P.return $ runMap m p
 
--- toAccMap :: Sector n c
---          -> Resolution n
---          -> DimensionalMap n (A.Exp c) (A.Exp a)
---          -> AccMap c a
--- toAccMap s r = changeCoordinates A.unlift
---              . changeCoordinates fromShape
---              -- . changeCoordinates fromIntegral
---              . transformCoordinates ((toSector r) `to` s)
+type PixelMap c = DimensionalMap 2 (Exp c) (Exp (RGB Word8))
 
--- bakeMap :: ( SameDimension n sh
---            , A.Shape sh
---            , Fractional c
---            , Dim n
---            )
---         => Sector n c
---         -> Resolution n
---         -> DimensionalMap n (A.Exp c) (A.Exp a)
---         -> A.Array sh a
--- bakeMap = _
-
--- | Fuck the accelerate library, I mean seriously guys why you gotta make everything so hard?
-bakeAccMap :: ( A.Shape sh
-              , A.Elt a
-              , SameDimension n sh )
-           -- => Sector n c
-           => Resolution n
-           -> AccMap sh a
-           -> A.Array sh a
-bakeAccMap r m = I.run $ toAcc (toShape r) m
-
-toShape :: ( A.Shape sh
-           , SameDimension n sh
-           )
-        => (V n Int)
-        -> sh
-toShape = A.listToShape . V.toList . toVector
-
-fromShape :: (A.Shape sh, SameDimension n sh)
-          => sh
-          -> V n Int
-fromShape = V . V.fromList . A.shapeToList
-
-instance SameDimension 0 A.Z
-instance (SameDimension n sh, n' ~ (n + 1)) => SameDimension n' (sh A.:. Int)
+writePixelMap :: (FromIntegral P.Int c, P.Num c) => P.FilePath -> Resolution 2 -> PixelMap c -> P.IO ()
+writePixelMap path r m = writeImageToBMP path
+                       $ bakeMap2 r
+                       $ mapMap packRGB8 m

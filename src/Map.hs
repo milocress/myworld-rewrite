@@ -18,6 +18,7 @@ module Map ( MapT
            , updateCoordinates
            , changeCoordinates
            , mapMapT
+           , mapMap
            ) where
 
 import Control.Monad.Reader
@@ -69,3 +70,6 @@ changeCoordinates = withReaderT
 -- | Changes the underlying monad of a 'MapT'
 mapMapT :: (m a -> n b) -> MapT c m a -> MapT c n b
 mapMapT = mapReaderT
+
+mapMap :: (a -> b) -> Map c a -> Map c b
+mapMap = fmap

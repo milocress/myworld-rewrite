@@ -29,9 +29,11 @@ dependencies:
 - repa
 - JuicyPixels
 - accelerate
-  #- linear-accelerate
-  #- accelerate-llvm-native
-  #- accelerate-llvm-ptx
+- linear-accelerate
+- colour-accelerate
+- accelerate-llvm-native
+- accelerate-llvm-ptx
+- accelerate-io
 
 library:
   source-dirs: src
