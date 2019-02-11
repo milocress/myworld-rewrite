@@ -10,37 +10,36 @@ import Linear.Metric (normalize)
 
 import Map.Dimension (Resolution, resolution)
 
-import Codec.Picture (DynamicImage, savePngImage)
+-- import Codec.Picture (DynamicImage, savePngImage)
 
 import Engine
 
 main :: IO ()
-main = savePngImage ("/tmp/ImageTest.png") image
+main = renderScene cam scene lights "/tmp/ImageTest.png"
+
+type Precision = Double
 
 res :: Resolution 2
 res = resolution (1920) (1080)
 
-origin :: Vec3
+origin :: V3 Precision
 origin = pure 0
 
-cam :: Camera
-cam = Camera 90 (V3 0 0 5) (normalize $ V3 1 0 (-1)) (V3 0 0 1) 1 res
+cam :: Camera Precision
+cam = Camera 90 (V3 4 0 5) (normalize $ V3 0 0 (-1)) (normalize $ V3 (-1) 0 0) 1 res
 
-scene :: [NormalObject]
-scene = [ NormalObject $ Sphere 0.5 (V3 4 (-1) 0)
-        , NormalObject $ Sphere 0.1 (V3 3.8 1 0.1)
-        , NormalObject $ Sphere 0.1 (V3 4 0 0)
-        , NormalObject $ Plane (V3 5 0 0) (V3 (-1) 0 0)
-        , NormalObject $ Plane (V3 0 0 (-0.5)) (V3 0 0 1)
-        , NormalObject $ Plane (V3 0 (-2) 0) (V3 0 1 0)
-        , NormalObject $ Plane (V3 0 2 0) (V3 0 (-1) 0)
+scene :: [NormalObject Precision]
+scene = [ NormalObject $ (Sphere 0.5 (V3 4 (-1) 0)         :: Sphere Precision)
+        , NormalObject $ (Sphere 0.1 (V3 3.8 1 0.1)        :: Sphere Precision)
+        , NormalObject $ (Sphere 0.1 (V3 4 0 0)            :: Sphere Precision)
+        , NormalObject $ (Plane (V3 5 0 0) (V3 (-1) 0 0)   :: Plane  Precision)
+        , NormalObject $ (Plane (V3 0 0 (-0.5)) (V3 0 0 1) :: Plane  Precision)
+        , NormalObject $ (Plane (V3 0 (-2) 0) (V3 0 1 0)   :: Plane  Precision)
+        , NormalObject $ (Plane (V3 0 2 0) (V3 0 (-1) 0)   :: Plane  Precision)
         ]
 
-lights :: [PointLight]
+lights :: [PointLight Precision]
 lights = [ V3 0 0 4
          , V3 3.925 (-0.15) 0
          , V3 4 0 0
          ]
-
-image :: DynamicImage
-image = bakeScene cam scene lights

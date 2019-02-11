@@ -48,6 +48,13 @@ bakePixelMap :: ( Dim n
              -> DynamicImage
 bakePixelMap s r m = ImageRGB8 . toImage $ runIdentity $ bakeMap s r m
 
+writePixelMap :: ( Fractional a )
+              => FilePath
+              -> Resolution 2
+              -> PixelMap a
+              -> IO ()
+writePixelMap p r m = savePngImage p (bakePixelMap (toSector r) r m)
+
 black :: RGB8
 black = V3 0 0 0
 
