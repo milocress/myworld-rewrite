@@ -53,12 +53,6 @@ class ObjectC s a where
          ) => V3 a -> s -> a
   sdf p obj = runMap (sdfMap obj) (toV p)
 
-  adf :: ( Num a
-         , Ord a
-         , Floating a
-         ) => V3 a -> s -> a
-  adf p = abs . sdf p
-
   sdfMap :: ( Num a
             , Ord a
             , Floating a
@@ -241,11 +235,9 @@ data NormalObject a = forall s . NormalC s a => NormalObject s
 
 instance ObjectC (Object a) a where
   sdf p (Object o) = sdf p o
-  adf p (Object o) = adf p o
 
 instance ObjectC (NormalObject a) a where
   sdf p (NormalObject o) = sdf p o
-  adf p (NormalObject o) = adf p o
 
 instance NormalC (NormalObject a) a where
   normal p (NormalObject o) = normal p o

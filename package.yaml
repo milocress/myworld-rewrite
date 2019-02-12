@@ -69,6 +69,17 @@ executables:
     dependencies:
     - myworld
 
+  engine-gpu-exe:
+    main:                Main.hs
+    source-dirs:        app/GPU/
+    ghc-options:
+    - threaded
+    - rtsopts
+    - with-rtsopts=-N
+    - O2
+    dependencies:
+    - myworld
+
 tests:
   myworld-test:
     main:                Spec.hs
