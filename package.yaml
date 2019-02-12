@@ -28,12 +28,12 @@ dependencies:
 - containers
 - repa
 - JuicyPixels
-- accelerate
-- linear-accelerate
-- colour-accelerate
-- accelerate-llvm-native
-- accelerate-llvm-ptx
-- accelerate-io
+# - accelerate
+# - linear-accelerate
+# - colour-accelerate
+# - accelerate-llvm-native
+# - accelerate-llvm-ptx
+# - accelerate-io
 
 library:
   source-dirs: src
@@ -69,16 +69,16 @@ executables:
     dependencies:
     - myworld
 
-  engine-gpu-exe:
-    main:                Main.hs
-    source-dirs:        app/GPU/
-    ghc-options:
-    - threaded
-    - rtsopts
-    - with-rtsopts=-N
-    - O2
-    dependencies:
-    - myworld
+  # engine-gpu-exe:
+  #   main:                Main.hs
+  #   source-dirs:        app/GPU/
+  #   ghc-options:
+  #   - threaded
+  #   - rtsopts
+  #   - with-rtsopts=-N
+  #   - O2
+  #   dependencies:
+  #   - myworld
 
 tests:
   myworld-test:
