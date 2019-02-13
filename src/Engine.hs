@@ -46,20 +46,7 @@ maxSteps :: Int
 maxSteps = 1000
 
 class ObjectC s a where
-  {-# MINIMAL (sdf | sdfMap) #-}
-  sdf :: ( Num a
-         , Ord a
-         , Floating a
-         ) => V3 a -> s -> a
-  sdf p obj = runMap (sdfMap obj) (toV p)
-
-  sdfMap :: ( Num a
-            , Ord a
-            , Floating a
-            ) => s -> Map3 a a
-  sdfMap obj = do
-    p <- fromV <$> getPoint
-    return $ sdf p obj
+  sdf :: V3 a -> s -> a
 
 class ObjectC s a => NormalC s a where
   normal :: ( Floating a
@@ -68,26 +55,32 @@ class ObjectC s a => NormalC s a where
             )
          => V3 a -> s -> V3 a
   normal p scene = normalize $ V3
-    (de (p + x * epsilon) - de (p - x * epsilon))
-    (de (p + y * epsilon) - de (p - y * epsilon))
-    (de (p + z * epsilon) - de (p - z * epsilon))
+    (de (p + x) - de (p - x))
+    (de (p + y) - de (p - y))
+    (de (p + z) - de (p - z))
     where
       de = flip sdf scene
-      x = V3 1 0 0
-      y = V3 0 1 0
-      z = V3 0 0 1
-      epsilon = pure minDist
+      x = V3 epsilon 0 0
+      y = V3 0 epsilon 0
+      z = V3 0 0 epsilon
+      epsilon = minDist
 
-instance ObjectC (V3 a) a where
+instance Floating a => ObjectC (V3 a) a where
   sdf p v = norm $ v - p
 
-instance ObjectC s a => ObjectC [s] a where
+instance ( ObjectC s a
+         , Ord a
+         ) => ObjectC [s] a where
   sdf p = minimum . fmap (sdf p)
 
-instance NormalC s a => NormalC [s] a where
+instance ( NormalC s a
+         , Ord a
+         ) => NormalC [s] a where
   normal p = normal p . minimumBy (compare `on` sdf p)
 
-instance (ObjectC s a, ObjectC t a) => ObjectC (s, t) a where
+instance ( ObjectC s a
+         , ObjectC t a
+         , Ord a ) => ObjectC (s, t) a where
   sdf p (a, b) = min (sdf p a) (sdf p b)
 
 traceDist :: ( ObjectC s a
@@ -212,10 +205,12 @@ data Sphere a = Sphere { sphereRadius :: a
                        , spherePos    :: V3 a
                        }
 
-instance ObjectC (Sphere a) a where
+instance ( Num a
+         , Floating a
+         ) => ObjectC (Sphere a) a where
   sdf p Sphere{..} = norm (p - spherePos) - sphereRadius
 
-instance NormalC (Sphere a) a where
+instance (Floating a) => NormalC (Sphere a) a where
   normal p Sphere{..} = normalize $ p - spherePos
 
 type PointLight a = V3 a
@@ -224,10 +219,10 @@ data Plane a = Plane { planePoint  :: V3 a
                      , planeNormal :: V3 a
                      }
 
-instance ObjectC (Plane a) a where
+instance (Num a) => ObjectC (Plane a) a where
   sdf p Plane{..} = dot (p - planePoint) planeNormal
 
-instance NormalC (Plane a) a where
+instance (Num a) => NormalC (Plane a) a where
   normal _ Plane{..} = planeNormal
 
 data Object a = forall s . ObjectC s a => Object s
