@@ -7,6 +7,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Engine ( Object (..)
               , NormalObject (..)
+              , Map2
               , Map3
               , Camera (..)
               , renderScene
@@ -36,7 +37,7 @@ import Map.PixelMap (white, black, writePixelMap)
 
 -- import qualified Data.Array.Accelerate as A
 
-type Map3 c a = DimensionalMap 3 c a
+-- type Map3 c a = DimensionalMap 3 c a
 
 minDist, maxDist :: Fractional a => a
 minDist = 1e-4
@@ -236,3 +237,11 @@ instance ObjectC (NormalObject a) a where
 
 instance NormalC (NormalObject a) a where
   normal p (NormalObject o) = normal p o
+
+type Map2 a = DimensionalMap 2 a a
+type Map3 a = DimensionalMap 3 a a
+
+instance Floating a => ObjectC (Map2 a) a where
+  sdf p@(V3 x y _) m = sdf p . V3 x y . runMap m . toV $ V2 x y
+
+instance Floating a => NormalC (Map2 a) a where
