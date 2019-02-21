@@ -241,7 +241,8 @@ instance NormalC (NormalObject a) a where
 type Map2 a = DimensionalMap 2 a a
 type Map3 a = DimensionalMap 3 a a
 
-instance Floating a => ObjectC (Map2 a) a where
-  sdf p@(V3 x y _) m = sdf p . V3 x y . runMap m . toV $ V2 x y
+instance Num a => ObjectC (Map2 a) a where
+  -- ^ This is an extreme oversimplification
+  sdf (V3 x y z) m = runMap m (toV $ V2 x y) - z
 
-instance Floating a => NormalC (Map2 a) a where
+instance Num a => NormalC (Map2 a) a
