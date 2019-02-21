@@ -18,14 +18,14 @@
 #+LATEX_COMPILER: pdflatex
 
 #+BEGIN_EXPORT latex
-\title{
-  {Procedural Planet Generation} \\
-  {\large Champlain Valley Union High School} \\
-  {\includegraphics{res/RedHawk.png}}
+\title {
+  { Procedural Planet Generation } \\
+  { \large Champlain Valley Union High School } \\
+  { \includegraphics{ res/RedHawk.png } }
 }
 \author { Milo Cress 
-       \\ Advisor: Anna Couperthwait}
-\date{February 20, 2019}
+       \\ Advisor: Anna Couperthwait }
+\date{ February 20, 2019 }
 \maketitle
 \newpage
 % \tableofcontents
@@ -38,16 +38,25 @@
 #+END_EXPORT
 * Maps
   Foundational to the concept of terrain generation is its representation in 3-dimensional space. In cartography, maps provide information about an area of land by translating a given 2-dimensional point to a value. Heightmaps translate latitudes and longitudes to locations in 3-dimensional space by supplying a $z$ coordinate to a given $(x, y)$ coordinate pair. In climatology, "wetmaps" track rainfall over given areas, and predict, given an $(x, y)$ coordinate pair, the inches or centimeters of rain that land on or near than point in a given amount of time. In more complex simulations, vector fields which simulate wind and weather are used by meteorologists to predict the spread of weather events across an area. By encapsulating a tract of land and the forces that act on it as a spatial function, the large-scale calculation of terrain becomes trivial.
-** TODO Functional programming
+** Functional programming
    When speaking about maps, it's easy to imagine them as they are presented in most cartographical texts -- a layering of lines and colors on top of a page. However, attempting to use this model for procedural generation presents two immediate challenges:
    1. We don't know how these maps were created. All we're given is a data dump and assurance of its accuracy. 
    2. We are working in a limited resolution, and therefore must trade scale for level of detail. Since this representation of a map forces us to know the value of every point at once, we can either know the values of a small range of points with a great degree of detail, or a vast range of points with a limited degree of detail.
+   In short, traditional lookup-style maps are limited by the fact that in order to know the value of a map at a single point or collection of points, one must have pre-determined the value of that map at every conceivable point that could be requested. 
+   A functional approach to the map problem is to delay the calculation of the value of a given map until that value is absolutely necessary. While this is process requires more computing power, it vastly reduces the memory required to complete the operation, and it allows a map to encapsulate the processes that create it, rather than merely storing the data it creates.
+   
+   Adopting a functional style allows us to apply several tools to the development of complex maps.
 *** Monoids
+    Monoids consist of a binary operation and an identity element. 
+    For example, we can say that addition is a monoid whose binary operation is the function (+) and whose identity element is the number 0.
+    Similarly, lists are a monoid whose binary operation is concatentation (++) and whose identity element is the empty list ([]).
+    Describing maps as an instance of monoids enables us to combine and manipulate maps in a more natural, mathematical way. 
 *** Functors
-*** Endofunctors
+    Since maps are a parameterized type, they are essentially capable of encapsulating any imaginable value. This allows us to describe a map as a function from a point to a value of any type. Functors describe a set of operations for manipulating map values before a map is fully evaluated, or in other words operating on a value encapsulated by a map. This enables complex transformations to be elegantly specified using category theory.
 *** Monads
-    Monads are just monoids in the category of endofunctors!
+    Since monads are just monoids in the category of endofunctors, envisioning maps as instances of monads unlocks the potential for maps to be described more expressively, and possibly as a composition of other monadic values.
 *** Typeclasses
+    All of the constructs listed above are examples of =typeclasses=, which specify an interface for a type to implement. When we say that a map is an /instance/ of the typeclass =monoid=, we specify its behavior in certain conditions, and allow the typeclass itself to generalize our definition.
 * TODO Engine
 ** Raytracing
 *** Distance estimators
