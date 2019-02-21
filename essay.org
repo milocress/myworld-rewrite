@@ -1,0 +1,94 @@
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t toc:nil todo:t |:t
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.2.1)
+
+
+#+LATEX_CLASS: article
+#+LATEX_HEADER_EXTRA: \usepackage{graphicx}
+#+LATEX_HEADER_EXTRA: \usepackage{url}
+#+LATEX_HEADER_EXTRA: \usepackage{biblatex}
+#+LATEX_HEADER_EXTRA: \addbibresource{res/bib.bib}
+#+LATEX_HEADER_EXTRA: \usepackage[a4paper, width=150mm, top=25mm, bottom=25mm, bindingoffset=0mm]{geometry}
+
+#+LATEX_COMPILER: pdflatex
+
+#+BEGIN_EXPORT latex
+\title{
+  {Procedural Planet Generation} \\
+  {\large Champlain Valley Union High School} \\
+  {\includegraphics{res/RedHawk.png}}
+}
+\author { Milo Cress 
+       \\ Advisor: Anna Couperthwait}
+\date{February 20, 2019}
+\maketitle
+\newpage
+% \tableofcontents
+#+END_EXPORT
+
+#+BEGIN_EXPORT latex
+\begin{abstract}
+  In this article, we present a system for the online rendering of realistic terrain at varying spatial and temporal scales using concurrent functional programming, and leveraging modern multicore computers.
+\end{abstract}
+#+END_EXPORT
+* Maps
+  Foundational to the concept of terrain generation is its representation in 3-dimensional space. In cartography, maps provide information about an area of land by translating a given 2-dimensional point to a value. Heightmaps translate latitudes and longitudes to locations in 3-dimensional space by supplying a $z$ coordinate to a given $(x, y)$ coordinate pair. In climatology, "wetmaps" track rainfall over given areas, and predict, given an $(x, y)$ coordinate pair, the inches or centimeters of rain that land on or near than point in a given amount of time. In more complex simulations, vector fields which simulate wind and weather are used by meteorologists to predict the spread of weather events across an area. By encapsulating a tract of land and the forces that act on it as a spatial function, the large-scale calculation of terrain becomes trivial.
+** TODO Functional programming
+   When speaking about maps, it's easy to imagine them as they are presented in most cartographical texts -- a layering of lines and colors on top of a page. However, attempting to use this model for procedural generation presents two immediate challenges:
+   1. We don't know how these maps were created. All we're given is a data dump and assurance of its accuracy. 
+   2. We are working in a limited resolution, and therefore must trade scale for level of detail. Since this representation of a map forces us to know the value of every point at once, we can either know the values of a small range of points with a great degree of detail, or a vast range of points with a limited degree of detail.
+*** Monoids
+*** Functors
+*** Endofunctors
+*** Monads
+    Monads are just monoids in the category of endofunctors!
+*** Typeclasses
+* TODO Engine
+** Raytracing
+*** Distance estimators
+*** Hacking procedural generation
+** Shadows
+*** Hard shadows
+*** Soft shadows
+** Reflections
+*** Specular
+*** Diffuse
+*** Caustics
+** Ambient occlusion (SSAO vs true ray-casting)
+* TODO Simulation
+** Continental Drift
+*** Force-Mapping over time (developing vector fields over heightmaps)
+** Erosion
+*** Gradient-descent force-maps
+* TODO Optimization
+** Functional programming (reprise)
+*** Deforestation (fusion)
+    The Haskell Community was clear in its recommendation of the Glasgow Haskell Compiler for optimization of functional code \cite{irc}.
+*** Graph reduction
+*** Parallelism
+*** Aptitude for compilers and static analysis (DSL)
+*** Automatic differentiation
+**** Reworking code to parameterize types
+*** GPU - parallelism
+    "GPUs are capable of massively parallel computation" \cite{cohn}
+*** Haskell Parallel DSL
+*** Reworking code for parameterized types
+*** Cuda library
+    Mark Engelhardt, a systems engineer and geospatial programmer, stressed thte importance of low-level optimization, even in high-level languages such as Haskell.
+* TODO To do
+** Material system
+*** Node-system (blender)
+*** Generative adversarial networks for textures
+** Typeclasses
+*** UV mapping typeclass
+*** Random sampling typeclass for soft shadows and diffuse shading
+
+* DONE Works Cited
+#+BEGIN_EXPORT latex
+\printbibliography
+#+END_EXPORT

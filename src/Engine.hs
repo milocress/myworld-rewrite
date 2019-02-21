@@ -236,3 +236,9 @@ instance ObjectC (NormalObject a) a where
 
 instance NormalC (NormalObject a) a where
   normal p (NormalObject o) = normal p o
+
+instance Num a => ObjectC (DimensionalMap 2 a a) a where
+  -- ^ This is an extreme oversimplification
+  sdf (V3 x y z) m = runMap m (toV $ V2 x y) - z
+
+instance Num a => NormalC (DimensionalMap 2 a a) a
