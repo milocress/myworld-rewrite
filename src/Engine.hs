@@ -192,9 +192,11 @@ uvToWorld cam (V2 u v) = camPos
   lenY = ((v / resY) - 0.5) * scale * ratio camRes
   scale = (sin . toRadians $ (camFov / 2)) * camScale
 
+-- | I don't know why this is necessary, it honestly shouldn't be, but here we are.
 wierdHack :: V3 a -> V3 a
 wierdHack (V3 x y z) = V3 y x z
 
+-- | Applies a weird hack to the camera so that the image is not distorted.
 hackCam :: Camera a -> Camera a
 hackCam c@Camera{..} = c { camUp = wierdHack camUp }
 
@@ -241,8 +243,8 @@ instance NormalC (NormalObject a) a where
 type Map2 a = DimensionalMap 2 a a
 type Map3 a = DimensionalMap 3 a a
 
-instance Num a => ObjectC (Map2 a) a where
-  -- ^ This is an extreme oversimplification
-  sdf (V3 x y z) m = runMap m (toV $ V2 x y) - z
+instance (Num a, Floating a) => ObjectC (Map2 a) a where
+  -- | This is an extreme oversimplification
+  sdf p@(V3 x y _) m = sdf p (V3 x y (runMap m (toV $ V2 x y)))
 
-instance Num a => NormalC (Map2 a) a
+instance (Num a, Floating a) => NormalC (Map2 a) a

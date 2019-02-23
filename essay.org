@@ -9,14 +9,28 @@
 
 
 #+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS: [12pt]
+
+# #+LATEX_HEADER_EXTRA: \documentclass[12pt]{article}
+
 #+LATEX_HEADER_EXTRA: \usepackage{graphicx}
 #+LATEX_HEADER_EXTRA: \usepackage{url}
+
 #+LATEX_HEADER_EXTRA: \usepackage{biblatex}
 #+LATEX_HEADER_EXTRA: \addbibresource{res/bib.bib}
-#+LATEX_HEADER_EXTRA: \usepackage[a4paper, width=180mm, top=25mm, bottom=25mm, bindingoffset=0mm]{geometry}
+
+#+LATEX_HEADER_EXTRA: \usepackage[a4paper, width=155mm, top=25mm, bottom=25mm, bindingoffset=0mm]{geometry}
+
 #+LATEX_HEADER_EXTRA: \usepackage{multicol}
 #+LATEX_HEADER_EXTRA: \setlength{\columnsep}{1cm}
 
+#+LATEX_HEADER_EXTRA: \usepackage{fancyhdr}
+#+LATEX_HEADER_EXTRA: \pagestyle{fancy}
+#+LATEX_HEADER_EXTRA: \fancyhf{}
+#+LATEX_HEADER_EXTRA: \fancyhead[R]{\thepage}
+
+#+LATEX_HEADER_EXTRA: \usepackage{setspace}
+#+LATEX_HEADER_EXTRA: \doublespacing
 
 #+LATEX_COMPILER: pdflatex
 
@@ -40,7 +54,7 @@
 \end{abstract}
 #+END_EXPORT
 * Maps
-\begin{multicols}{2}
+# \begin{multicols}{2}
   Foundational to the concept of terrain generation is its representation in 3-dimensional space. In cartography, maps provide information about an area of land by translating a given 2-dimensional point to a value. Heightmaps translate latitudes and longitudes to locations in 3-dimensional space by supplying a $z$ coordinate to a given $(x, y)$ coordinate pair. In climatology, "wetmaps" track rainfall over given areas, and predict, given an $(x, y)$ coordinate pair, the inches or centimeters of rain that land on or near than point in a given amount of time. In more complex simulations, vector fields which simulate wind and weather are used by meteorologists to predict the spread of weather events across an area. By encapsulating a tract of land and the forces that act on it as a spatial function, the large-scale calculation of terrain becomes trivial.
 ** Functional programming
    When speaking about maps, it's easy to imagine them as they are presented in most cartographical texts -- a layering of lines and colors on top of a page. However, attempting to use this model for procedural generation presents two immediate challenges:
@@ -61,10 +75,9 @@
     Since monads are merely monoids in the category of endofunctors, envisioning maps as instances of monads unlocks the potential for maps to be described more expressively, and possibly as a composition of other monadic values using Kleisli arrows ($>>=$).
 *** Typeclasses
     All of the constructs listed above are examples of =typeclasses=, which specify an interface for a type to implement. When we say that a map is an instance of the typeclass =monoid=, we specify its behavior in certain conditions, and allow the typeclass itself to generalize our definition, and specialize polymorphic functions to our specific type.
-\end{multicols}
-# \newpage
+# \end{multicols}
 * Engine
-\begin{multicols}{2}
+# \begin{multicols}{2}
   Many of the performance and accuracy advantages of procedural geometry generation are negated by "baking" this geometry into the polygonal meshes and rectangular textures required by traditional game engines. During the development of the procedural planet generation software, the author realized that a functional-style engine was necessary to render functional-style maps.
 ** Raytracing
    Many modern engines employ ray-tracing algorithms to simulate the paths of light in a virtual medium. 
@@ -109,10 +122,9 @@
     Caustics are the reflection of bright reflections, commonly caused by water or mirrors bouncing off of a diffuse surface. Though these are difficult to simulate without path-tracing, The author is exploring less computationally costly alternatives.
 
 
-\end{multicols}
-# \newpage
+# \end{multicols}
 * Optimization
-\begin{multicols}{2}
+# \begin{multicols}{2}
   The processes described trade predefined geometry for dynamically calculated geometry, giving the programmer greater power in dynamically modifying the level of detail of a sector at runtime. However, these runtime calculations greatly increase the complexity of the algorithm, which decreases the number of frames that can be rendered in a given unit of time. 
 
   Optimizations that reduce the amount of time needed to render a frame can be developed through several methods:
@@ -184,10 +196,9 @@
     
     The =Cuda= library allows Haskell code to call low-level, handcrafted cuda code to achieve high-performance output. 
 
-\end{multicols}
-# \newpage
+# \end{multicols}
 * TODO To do
-  \begin{multicols}{2}
+  # \begin{multicols}{2}
   The project, as its original goals were expressed, is nearing completion. However, some key features remain to be implemented.
 ** Simulation
 *** Perlin Noise
@@ -197,7 +208,6 @@
 *** Erosion
    Simulated rainfall maps can be used to calculate the erosion coefficient for a given area. Simulated forces are then applied to each point in the heightmap to distort it, simulating the percussive force of water on stone and soil.
 
-# \newpage
 ** Material system
 *** Node-system (blender)
 *** Generative adversarial networks for textures
@@ -205,8 +215,7 @@
 *** UV mapping typeclass
 *** Random sampling typeclass for soft shadows and diffuse shading
 
-\end{multicols}
-# \newpage
+# \end{multicols}
 * Works Cited
 #+BEGIN_EXPORT latex
 \printbibliography
