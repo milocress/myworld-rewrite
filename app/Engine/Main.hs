@@ -37,9 +37,9 @@ origin = pure 0
 
 cam :: Camera FloatPrecision
 cam = Camera 90                        -- field of view
-             (V3 4 0 4)                -- position
-             (normalize $ V3 0 0 (-1)) -- lookAt
-             (normalize $ V3 1 0 0)    -- camUp
+             (V3 0 0 0)                -- position
+             (normalize $ V3 1 0 0)    -- lookAt
+             (normalize $ V3 0 0 1)    -- camUp
              1                         -- scale
              res                       -- resolution
 
@@ -49,15 +49,15 @@ scene = [
         , NormalObject $ ( Sphere 0.1 (V3 3.8 1 0.1)        :: Sphere FloatPrecision )
         , NormalObject $ ( Sphere 0.1 (V3 4 0 0)            :: Sphere FloatPrecision )
         , NormalObject $ ( Plane (V3 5 0 0) (V3 (-1) 0 0)   :: Plane  FloatPrecision )
-        -- , NormalObject $ ( Plane (V3 0 0 (-0.5)) (V3 0 0 1) :: Plane  FloatPrecision )
+        , NormalObject $ ( Plane (V3 0 0 (-0.5)) (V3 0 0 1) :: Plane  FloatPrecision )
         , NormalObject $ ( Plane (V3 0 (-2) 0) (V3 0 1 0)   :: Plane  FloatPrecision )
         , NormalObject $ ( Plane (V3 0 2 0) (V3 0 (-1) 0)   :: Plane  FloatPrecision )
-        , NormalObject $ ( (do
-                               (V2 x y) <- fromV <$> getPoint
-                               let bump = sin (x * roughness) + sin (y * roughness)
-                                   roughness = 10
-                               return $ 0.01 * bump - 0.5
-                           ) :: Map2   FloatPrecision )
+        -- , NormalObject $ ( (do
+        --                        (V2 x y) <- fromV <$> getPoint
+        --                        let bump = sin (x * roughness) + sin (y * roughness)
+        --                            roughness = 10
+        --                        return $ 0.01 * bump - 0.5
+        --                    ) :: Map2   FloatPrecision )
         ]
 
 lights :: [PointLight FloatPrecision]

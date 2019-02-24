@@ -30,6 +30,8 @@ import Linear.V3
 import Linear.V
 import Linear.Metric (normalize)
 import Linear.Epsilon (Epsilon)
+import Linear.Quaternion (rotate, axisAngle)
+import Linear.Conjugate (Conjugate)
 
 import Data.Maybe (fromMaybe)
 
@@ -42,9 +44,9 @@ data Camera a = Camera { camFov    :: a            -- ^ angle, in degrees
                        , camUp     :: V3 a         -- ^ Must be perpendicular to camFacing
                        , camScale  :: a            -- ^ scale
                        , camRes    :: Resolution 2 -- ^ resolution
-                     }
+                       }
 
-renderScene :: (RealFrac a, NormalC p a, Epsilon a, Floating a, Integral b)
+renderScene :: (RealFrac a, NormalC p a, Epsilon a, Floating a, Conjugate a, RealFloat a, Integral b)
             => EngineConfig a b -> Camera a -> p -> [V3 a] -> FilePath -> IO ()
 renderScene conf cam@Camera{..} objects lights path = writePixelMap path camRes m where
   m = do
@@ -64,26 +66,19 @@ ratio res = let
 uvToWorld :: ( Num a
              , Floating a
              , Epsilon a
+             , Conjugate a
+             , RealFloat a
              )
           => Camera a -> V2 a -> V3 a
-uvToWorld cam (V2 u v) = camPos
+uvToWorld Camera{..} (V2 u v) = camPos
                        + (camFacing * pure camScale)
                        + (pure lenX * dir)
                        + (pure lenY * camUp) where
-  (Camera{..}) = hackCam cam
-  dir = normalize $ cross camUp camFacing
+  dir = normalize $ rotate (axisAngle camFacing $ 3 * pi / 2) camUp
   (V2 resX resY) = fromV $ fromIntegral <$> camRes
-  lenX = ((u / resX) - 0.5) * scale
-  lenY = ((v / resY) - 0.5) * scale * ratio camRes
+  lenY = -((u / resX) - 0.5) * scale
+  lenX = ((v / resY) - 0.5) * scale * ratio camRes
   scale = (sin . toRadians $ (camFov / 2)) * camScale
-
--- | I don't know why this is necessary, it honestly shouldn't be, but here we are.
-wierdHack :: V3 a -> V3 a
-wierdHack (V3 x y z) = V3 y x z
-
--- | Applies a weird hack to the camera so that the image is not distorted.
-hackCam :: Camera a -> Camera a
-hackCam c@Camera{..} = c { camUp = wierdHack camUp }
 
 toRadians :: ( Fractional a
              , Floating a ) => a -> a

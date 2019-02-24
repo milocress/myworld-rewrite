@@ -28,6 +28,7 @@ dependencies:
 - containers
 - repa
 - JuicyPixels
+- ad
 # - accelerate
 # - linear-accelerate
 # - colour-accelerate
