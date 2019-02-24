@@ -1,5 +1,5 @@
 .stack-work/
 myworld.cabal
 *~
-essay.tex
-essay.bbl
+essay.*
+!essay.org
