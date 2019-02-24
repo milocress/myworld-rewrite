@@ -1,0 +1,42 @@
+\BOOKMARK [1][-]{section.1}{Maps}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Functional programming}{section.1}% 2
+\BOOKMARK [3][-]{subsubsection.1.1.1}{Monoids}{subsection.1.1}% 3
+\BOOKMARK [3][-]{subsubsection.1.1.2}{Functors}{subsection.1.1}% 4
+\BOOKMARK [3][-]{subsubsection.1.1.3}{Monads}{subsection.1.1}% 5
+\BOOKMARK [3][-]{subsubsection.1.1.4}{Typeclasses}{subsection.1.1}% 6
+\BOOKMARK [1][-]{section.2}{TODO Engine}{}% 7
+\BOOKMARK [2][-]{subsection.2.1}{Raytracing}{section.2}% 8
+\BOOKMARK [3][-]{subsubsection.2.1.1}{Distance estimators}{subsection.2.1}% 9
+\BOOKMARK [3][-]{subsubsection.2.1.2}{Hacking procedural generation}{subsection.2.1}% 10
+\BOOKMARK [2][-]{subsection.2.2}{Shadows}{section.2}% 11
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Hard shadows}{subsection.2.2}% 12
+\BOOKMARK [3][-]{subsubsection.2.2.2}{Soft shadows}{subsection.2.2}% 13
+\BOOKMARK [2][-]{subsection.2.3}{Reflections}{section.2}% 14
+\BOOKMARK [3][-]{subsubsection.2.3.1}{Specular}{subsection.2.3}% 15
+\BOOKMARK [3][-]{subsubsection.2.3.2}{Diffuse}{subsection.2.3}% 16
+\BOOKMARK [3][-]{subsubsection.2.3.3}{Caustics}{subsection.2.3}% 17
+\BOOKMARK [2][-]{subsection.2.4}{Ambient occlusion \(SSAO vs true ray-casting\)}{section.2}% 18
+\BOOKMARK [1][-]{section.3}{TODO Simulation}{}% 19
+\BOOKMARK [2][-]{subsection.3.1}{Continental Drift}{section.3}% 20
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Force-Mapping over time \(developing vector fields over heightmaps\)}{subsection.3.1}% 21
+\BOOKMARK [2][-]{subsection.3.2}{Erosion}{section.3}% 22
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Gradient-descent force-maps}{subsection.3.2}% 23
+\BOOKMARK [1][-]{section.4}{TODO Optimization}{}% 24
+\BOOKMARK [2][-]{subsection.4.1}{Functional programming \(reprise\)}{section.4}% 25
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Deforestation \(fusion\)}{subsection.4.1}% 26
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Graph reduction}{subsection.4.1}% 27
+\BOOKMARK [3][-]{subsubsection.4.1.3}{Parallelism}{subsection.4.1}% 28
+\BOOKMARK [3][-]{subsubsection.4.1.4}{Aptitude for compilers and static analysis \(DSL\)}{subsection.4.1}% 29
+\BOOKMARK [3][-]{subsubsection.4.1.5}{Automatic differentiation}{subsection.4.1}% 30
+\BOOKMARK [3][-]{subsubsection.4.1.6}{GPU - parallelism}{subsection.4.1}% 31
+\BOOKMARK [3][-]{subsubsection.4.1.7}{Haskell Parallel DSL}{subsection.4.1}% 32
+\BOOKMARK [3][-]{subsubsection.4.1.8}{Reworking code for parameterized types}{subsection.4.1}% 33
+\BOOKMARK [3][-]{subsubsection.4.1.9}{Cuda library}{subsection.4.1}% 34
+\BOOKMARK [1][-]{section.5}{TODO To do}{}% 35
+\BOOKMARK [2][-]{subsection.5.1}{Material system}{section.5}% 36
+\BOOKMARK [3][-]{subsubsection.5.1.1}{Node-system \(blender\)}{subsection.5.1}% 37
+\BOOKMARK [3][-]{subsubsection.5.1.2}{Generative adversarial networks for textures}{subsection.5.1}% 38
+\BOOKMARK [2][-]{subsection.5.2}{Typeclasses}{section.5}% 39
+\BOOKMARK [3][-]{subsubsection.5.2.1}{UV mapping typeclass}{subsection.5.2}% 40
+\BOOKMARK [3][-]{subsubsection.5.2.2}{Random sampling typeclass for soft shadows and diffuse shading}{subsection.5.2}% 41
+\BOOKMARK [1][-]{section.6}{DONE Works Cited}{}% 42

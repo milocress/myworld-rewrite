@@ -18,42 +18,49 @@ import Map.Dimension (Resolution, resolution)
 import Engine
 
 main :: IO ()
-main = renderScene cam scene lights "/tmp/ImageTest.png"
+main = renderScene myEngine cam scene lights "/tmp/ImageTest.png"
 
-type Precision = Double
+type FloatPrecision = Double
+type IntPrecision   = Int
+
+myEngine :: EngineConfig FloatPrecision IntPrecision
+myEngine = EngineConfig { maxSteps = 100
+                        , maxDist  = 1000
+                        , minDist  = 1e-4
+                        }
 
 res :: Resolution 2
 res = resolution (1920) (1080)
 
-origin :: V3 Precision
+origin :: V3 FloatPrecision
 origin = pure 0
 
-cam :: Camera Precision
+cam :: Camera FloatPrecision
 cam = Camera 90                        -- field of view
              (V3 4 0 4)                -- position
-             (normalize $ V3 0 0 (-1))    -- lookAt
+             (normalize $ V3 0 0 (-1)) -- lookAt
              (normalize $ V3 1 0 0)    -- camUp
              1                         -- scale
              res                       -- resolution
 
-scene :: [NormalObject Precision]
+scene :: [NormalObject FloatPrecision]
 scene = [
-          NormalObject $ ( Sphere 0.5 (V3 4 (-1) 0)         :: Sphere Precision )
-        , NormalObject $ ( Sphere 0.1 (V3 3.8 1 0.1)        :: Sphere Precision )
-        , NormalObject $ ( Sphere 0.1 (V3 4 0 0)            :: Sphere Precision )
-        , NormalObject $ ( Plane (V3 5 0 0) (V3 (-1) 0 0)   :: Plane  Precision )
-        -- , NormalObject $ ( Plane (V3 0 0 (-0.5)) (V3 0 0 1) :: Plane  Precision )
-        , NormalObject $ ( Plane (V3 0 (-2) 0) (V3 0 1 0)   :: Plane  Precision )
-        , NormalObject $ ( Plane (V3 0 2 0) (V3 0 (-1) 0)   :: Plane  Precision )
+          NormalObject $ ( Sphere 0.5 (V3 4 (-1) 0)         :: Sphere FloatPrecision )
+        , NormalObject $ ( Sphere 0.1 (V3 3.8 1 0.1)        :: Sphere FloatPrecision )
+        , NormalObject $ ( Sphere 0.1 (V3 4 0 0)            :: Sphere FloatPrecision )
+        , NormalObject $ ( Plane (V3 5 0 0) (V3 (-1) 0 0)   :: Plane  FloatPrecision )
+        -- , NormalObject $ ( Plane (V3 0 0 (-0.5)) (V3 0 0 1) :: Plane  FloatPrecision )
+        , NormalObject $ ( Plane (V3 0 (-2) 0) (V3 0 1 0)   :: Plane  FloatPrecision )
+        , NormalObject $ ( Plane (V3 0 2 0) (V3 0 (-1) 0)   :: Plane  FloatPrecision )
         , NormalObject $ ( (do
                                (V2 x y) <- fromV <$> getPoint
                                let bump = sin (x * roughness) + sin (y * roughness)
                                    roughness = 10
                                return $ 0.01 * bump - 0.5
-                           ) :: Map2   Precision )
+                           ) :: Map2   FloatPrecision )
         ]
 
-lights :: [PointLight Precision]
+lights :: [PointLight FloatPrecision]
 lights = [ V3 0 0 4
          -- , V3 3.925 (-0.15) 0
          -- , V3 4 0 0
