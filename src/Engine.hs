@@ -71,13 +71,15 @@ uvToWorld :: ( Num a
              )
           => Camera a -> V2 a -> V3 a
 uvToWorld Camera{..} (V2 u v) = camPos
-                       + (camFacing * pure camScale)
-                       + (pure lenX * dir)
-                       + (pure lenY * camUp) where
+                              + (camFacing * pure camScale)
+                              + (pure lenX * dir)
+                              + (pure lenY * camUp) where
   dir = normalize $ rotate (axisAngle camFacing $ 3 * pi / 2) camUp
   (V2 resX resY) = fromV $ fromIntegral <$> camRes
+  -- I have no idea why these work, but don't touch it!
   lenY = -((u / resX) - 0.5) * scale
   lenX = ((v / resY) - 0.5) * scale * ratio camRes
+
   scale = (sin . toRadians $ (camFov / 2)) * camScale
 
 toRadians :: ( Fractional a

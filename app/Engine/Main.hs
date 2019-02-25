@@ -37,9 +37,9 @@ origin = pure 0
 
 cam :: Camera FloatPrecision
 cam = Camera 90                        -- field of view
-             (V3 0 0 0)                -- position
-             (normalize $ V3 1 0 0)    -- lookAt
-             (normalize $ V3 0 0 1)    -- camUp
+             (V3 4 0 4)                -- position
+             (normalize $ V3 0 0 (-1))    -- lookAt
+             (normalize $ V3 1 0 0)    -- camUp
              1                         -- scale
              res                       -- resolution
 
@@ -62,6 +62,6 @@ scene = [
 
 lights :: [PointLight FloatPrecision]
 lights = [ V3 0 0 4
-         -- , V3 3.925 (-0.15) 0
-         -- , V3 4 0 0
+         , V3 3.925 (-0.15) 0
+         , V3 4 0 0
          ]
