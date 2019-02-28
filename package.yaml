@@ -29,7 +29,6 @@ dependencies:
 - repa
 - JuicyPixels
 - ad
-- reflection
 - transformers
 # - accelerate
 # - linear-accelerate

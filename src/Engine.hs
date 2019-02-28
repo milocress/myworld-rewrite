@@ -53,18 +53,12 @@ renderScene conf cam@Camera{..} objects lights path = writePixelMap path camRes 
            . runEngine (runMaybeT (traceColor p (normalize $ p - camPos) objects lights))
            $ conf
 
-ratio :: ( Num a
-         , Fractional a
-         )
-      => Resolution 2 -> a
+ratio :: ( Num a , Fractional a) => Resolution 2 -> a
 ratio res = let
   (V2 x y) = fromV $ fromIntegral <$> res
   in y / x
 
-uvToWorld :: ( Num a
-             , Floating a
-             , Epsilon a
-             )
+uvToWorld :: ( Num a , Floating a , Epsilon a)
           => Camera a -> V2 a -> V3 a
 uvToWorld Camera{..} (V2 u v) = camPos
                               + (camFacing * pure camScale)
@@ -78,7 +72,7 @@ uvToWorld Camera{..} (V2 u v) = camPos
 
   scale = (sin . toRadians $ (camFov / 2)) * camScale
 
-toRadians :: ( Fractional a
-             , Floating a ) => a -> a
+toRadians :: ( Fractional a , Floating a )
+          => a -> a
 toRadians theta = pi * theta / 180
 
