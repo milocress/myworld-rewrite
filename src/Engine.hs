@@ -30,8 +30,6 @@ import Linear.V3
 import Linear.V
 import Linear.Metric (normalize)
 import Linear.Epsilon (Epsilon)
-import Linear.Quaternion (rotate, axisAngle)
-import Linear.Conjugate (Conjugate)
 
 import Data.Maybe (fromMaybe)
 import Control.Monad.Trans.Maybe (runMaybeT)
@@ -46,7 +44,7 @@ data Camera a = Camera { camFov    :: a            -- ^ angle, in degrees
                        , camRes    :: Resolution 2 -- ^ resolution
                        }
 
-renderScene :: (RealFrac a, NormalC p a, Epsilon a, Floating a, Conjugate a, RealFloat a, Integral b)
+renderScene :: (RealFrac a, NormalC p a, Epsilon a, Floating a, Integral b)
             => EngineConfig a b -> Camera a -> p -> [V3 a] -> FilePath -> IO ()
 renderScene conf cam@Camera{..} objects lights path = writePixelMap path camRes m where
   m = do
@@ -66,15 +64,13 @@ ratio res = let
 uvToWorld :: ( Num a
              , Floating a
              , Epsilon a
-             , Conjugate a
-             , RealFloat a
              )
           => Camera a -> V2 a -> V3 a
 uvToWorld Camera{..} (V2 u v) = camPos
                               + (camFacing * pure camScale)
                               + (pure lenX * dir)
                               + (pure lenY * camUp) where
-  dir = normalize $ rotate (axisAngle camFacing $ 3 * pi / 2) camUp
+  dir = normalize $ cross camUp camFacing
   (V2 resX resY) = fromV $ fromIntegral <$> camRes
   -- I have no idea why these work, but don't touch it!
   lenY = -((u / resX) - 0.5) * scale
