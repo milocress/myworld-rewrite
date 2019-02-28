@@ -46,13 +46,15 @@ traceRay conf point ray scene = do
 
 traceColor :: (Floating a, Epsilon a, NormalC s a, Integral b, RealFrac a, Integral c)
            => EngineConfig a b -> V3 a -> V3 a -> s -> [PointLight a] -> Maybe (V3 c)
-traceColor conf point ray scene lights = do
+traceColor conf@EngineConfig{..} point ray scene lights = do
   p <- traceRay conf point ray scene
   let n = normal p scene
       ambient = 0.1
       diffuse = average $ do
                   l <- lights
-                  let shade = shadow conf p n scene l
+                  let shade = if shadowsEnabled
+                              then shadow conf p n scene l
+                              else 1.0
                   return . (* shade)
                          . clamp 0 1
                          $ dot (normalize $ l - p) n

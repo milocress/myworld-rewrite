@@ -5,23 +5,23 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Engine.Class where
 
 import Map (Map, runMap)
 
-import Linear.V (toV, fromV)
+-- import Linear.V (toV, fromV)
 import Linear.V2 (V2(..))
-import Linear.V3 (V3(..), cross)
+import Linear.V3 (V3(..))
 import Linear.Epsilon (Epsilon)
-import Linear.Conjugate (Conjugate)
+-- import Linear.Conjugate (Conjugate)
 import Linear.Metric (normalize, norm, dot)
-import Linear.Quaternion (rotate, axisAngle)
+-- import Linear.Quaternion (rotate, axisAngle)
 
--- import Numeric.AD (grad, grad')
+-- import Numeric.AD (grad)
 -- import Numeric.AD.Mode.Reverse (Reverse)
-import Numeric.Backprop
 
 import Data.Function (on)
 
@@ -78,21 +78,34 @@ instance NormalC (NormalObject a) a where
   normal p (NormalObject o) = normal p o
 
 type Map2 a = Map (V2 a) a
-type Map3 a = Map (V3 a) a
+type DualMap2 a = Map (V2 a) (a, V3 a)
 
-instance (Num a, Floating a, Conjugate a, RealFloat a) => ObjectC (Map2 a) a where
-  -- | This is an extreme oversimplification
+-- instance (Floating a) => ObjectC (Map2 a) a where
+--   -- | This is an extreme oversimplification
+--   sdf p@(V3 x y _) m = sdf p p' where
+--     z  = runMap m (V2 x y)
+--     p' = V3 x y z
+
+instance (Floating a, Ord a) => ObjectC (DualMap2 a) a where
+  -- | Again, this is an extreme oversimplification
   sdf p@(V3 x y _) m = sdf p p' where
-    z  = runMap m (V2 x y)
-    p' = V3 x y z
+    mapAt (V3 a b _) = (V3 a b (fst $ runMap m (V2 a b)))
+    pointCloud point r = promote <$> do
+      r' <- [r, r / 2, r / 32]
+      [
+          point
+        , point + V2 0 r'
+        , point + V2 0 (-r')
+        , point + V2 r' 0
+        , point + V2 (-r') 0
+        ]
+    promote (V2 a b) = (V3 a b 0)
+    z  = fst $ runMap m (V2 x y)
+    -- p' = mapAt <$> pointCloud (V2 x y) z
+    p' = mapAt p
 
-instance (Num a, Floating a, Conjugate a, RealFloat a) => NormalC (Map2 a) a where
-  -- normal (V3 x y _) m = normalize $ cross (g) (rotate (axisAngle z $ pi / 4) gz) where
-  --   f = runMap m
-  --   (V2 a b) = gradBP f (V2 x y)
-  --   g = (V3 a b 0)
-  --   gz = (V3 a b $ g `dot` (normalize g))
-  --   z = V3 0 0 1
+instance (Floating a, Ord a) => NormalC (DualMap2 a) a where
+  normal (V3 x y _) m = snd $ runMap m (V2 x y)
 
 data Sphere a = Sphere { sphereRadius :: a
                        , spherePos    :: V3 a

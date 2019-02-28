@@ -8,7 +8,7 @@
 module Engine ( Object (..)
               , NormalObject (..)
               , Map2
-              , Map3
+              , DualMap2
               , Camera (..)
               , renderScene
               , PointLight
