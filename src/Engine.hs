@@ -1,3 +1,4 @@
+{-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeSynonymInstances #-}
@@ -9,6 +10,9 @@ module Engine ( Object (..)
               , NormalObject (..)
               , Map2
               , DualMap2
+              , DualMapInfo (..)
+              , GradMap2
+              , GradMapInfo (..)
               , Camera (..)
               , renderScene
               , PointLight
@@ -44,14 +48,14 @@ data Camera a = Camera { camFov    :: a            -- ^ angle, in degrees
                        , camRes    :: Resolution 2 -- ^ resolution
                        }
 
-renderScene :: (RealFrac a, NormalC p a, Epsilon a, Floating a, Integral b)
+renderScene :: (_)
             => EngineConfig a b -> Camera a -> p -> [V3 a] -> FilePath -> IO ()
 renderScene conf cam@Camera{..} objects lights path = writePixelMap path camRes m where
   m = do
     p <- uvToWorld cam <$> fromV <$> getPoint
     return . fromMaybe black
-           . runEngine (runMaybeT (traceColor p (normalize $ p - camPos) objects lights))
-           $ conf
+           . runEngine (runMaybeT . traceColor p . normalize $ p - camPos) conf
+           $ (EngineState objects lights)
 
 ratio :: ( Num a , Fractional a) => Resolution 2 -> a
 ratio res = let

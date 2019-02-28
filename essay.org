@@ -59,7 +59,7 @@
 ** Functional programming
    When speaking about maps, it's easy to imagine them as they are presented in most cartographical texts -- a layering of lines and colors on top of a page. However, attempting to use this model for procedural generation presents two immediate challenges:
    1. We don't know how these maps were created. All we're given is a data dump and assurance of its accuracy. 
-   2. We are working in a limited resolution, and therefore must trade scale for level of detail. Since this representation of a map forces the value of every point to be know all at once, one can either know the values of a small range of points with a great degree of detail, or a vast range of points with a limited degree of detail.
+   2. We are working in a limited resolution, and therefore must trade scale for level of detail. Since this representation of a map forces the value of every point to be known all at once, one can either know the values of a small range of points with a great degree of detail, or a vast range of points with a limited degree of detail.
    In short, traditional lookup-style maps are limited by the fact that in order to know the value of a map at a single point or collection of points, one must have pre-determined the value of that map at every conceivable point that could be requested. 
    A functional approach to the map problem is to delay the calculation of the value of a given map until that value is absolutely necessary. While this is process requires more computing power, it vastly reduces the memory required to complete the operation, and it allows a map to encapsulate the processes that create it, rather than merely storing the data it creates.
    

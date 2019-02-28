@@ -10,18 +10,12 @@
 
 module Engine.Class where
 
-import Map (Map, runMap)
+import Map (Map, runMap, getPoint)
 
--- import Linear.V (toV, fromV)
 import Linear.V2 (V2(..))
-import Linear.V3 (V3(..))
+import Linear.V3 (V3(..), cross)
 import Linear.Epsilon (Epsilon)
--- import Linear.Conjugate (Conjugate)
 import Linear.Metric (normalize, norm, dot)
--- import Linear.Quaternion (rotate, axisAngle)
-
--- import Numeric.AD (grad)
--- import Numeric.AD.Mode.Reverse (Reverse)
 
 import Data.Function (on)
 
@@ -77,23 +71,52 @@ instance ObjectC (NormalObject a) a where
 instance NormalC (NormalObject a) a where
   normal p (NormalObject o) = normal p o
 
-type Map2 a = Map (V2 a) a
-type DualMap2 a = Map (V2 a) (a, V3 a)
 
--- instance (Floating a) => ObjectC (Map2 a) a where
---   -- | This is an extreme oversimplification
---   sdf p@(V3 x y _) m = sdf p p' where
---     z  = runMap m (V2 x y)
---     p' = V3 x y z
+data DualMapInfo a = DualMapInfo { getDValue :: a
+                                 , getNormal :: V3 a
+                                 , getNearestPoint :: V3 a -> V3 a
+                                 }
+
+data GradMapInfo a = GradMapInfo { getGValue :: a
+                                 , getGrad :: V2 a
+                                 }
+
+type Map2 a = Map (V2 a) a
+type DualMap2 a = Map (V2 a) (DualMapInfo a)
+
+type GradMap2 a = Map (V2 a) (GradMapInfo a)
+
+demote :: V3 a -> V2 a
+demote (V3 x y _) = V2 x y
+promote :: Num a => V2 a -> V3 a
+promote (V2 x y) = V3 x y 0
+
+toDualMap :: (Num a, Floating a, Epsilon a) => GradMap2 a -> DualMap2 a
+toDualMap m = do
+  p@(V2 u v) <- getPoint
+  let (GradMapInfo val g) = runMap m p
+      dz = g `dot` normalize g
+      z  = V3 0 0 1
+      g3 = normalize . promote $ g
+      n = normalize $ cross
+        (g3 + pure dz * z)
+        (cross z g3)
+  return $ DualMapInfo val n (const $ V3 u v val)
 
 instance (Floating a, Ord a) => ObjectC (DualMap2 a) a where
   -- | Again, this is an extreme oversimplification
-  sdf p m = sdf p p' where
-    mapAt (V3 a b _) = (V3 a b (fst $ runMap m (V2 a b)))
-    p' = mapAt p
+  sdf p m = sdf p . getNearestPoint (runMap m $ demote p) $ p
 
 instance (Floating a, Ord a) => NormalC (DualMap2 a) a where
-  normal (V3 x y _) m = snd $ runMap m (V2 x y)
+  normal p m = getNormal
+             . runMap m
+             $ demote p
+
+instance (Floating a, Ord a, Epsilon a) => ObjectC (GradMap2 a) a where
+  sdf p m = sdf p (toDualMap m)
+
+instance (Floating a, Ord a, Epsilon a) => NormalC (GradMap2 a) a where
+  normal p m = normal p (toDualMap m)
 
 data Sphere a = Sphere { sphereRadius :: a
                        , spherePos    :: V3 a

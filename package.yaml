@@ -25,7 +25,6 @@ dependencies:
 - linear
 - vector
 - recursion-schemes
-- containers
 - repa
 - JuicyPixels
 - ad
