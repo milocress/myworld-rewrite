@@ -2,21 +2,15 @@
 {-# LANGUAGE ViewPatterns #-}
 module Main where
 
--- import Linear.V (fromV)
 import Linear.V2 (V2 (..))
 import Linear.V3 (V3 (..), cross)
 import Linear.Metric (normalize, dot)
--- import Linear.Quaternion (rotate, axisAngle)
 
 import Numeric.AD (grad)
 
 import Map (getPoint)
--- import Map.SectorMap (DimensionalMap)
--- import Sector
 
 import Map.Dimension (Resolution, resolution)
-
--- import Codec.Picture (DynamicImage, savePngImage)
 
 import Engine
 
