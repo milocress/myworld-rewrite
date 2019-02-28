@@ -34,7 +34,7 @@ import Linear.Quaternion (rotate, axisAngle)
 import Linear.Conjugate (Conjugate)
 
 import Data.Maybe (fromMaybe)
-
+import Control.Monad.Trans.Maybe (runMaybeT)
 
 import Map.PixelMap (black, writePixelMap)
 
@@ -52,8 +52,8 @@ renderScene conf cam@Camera{..} objects lights path = writePixelMap path camRes 
   m = do
     p <- uvToWorld cam <$> fromV <$> getPoint
     return . fromMaybe black
-           . traceColor conf p (normalize $ p - camPos) objects
-           $ lights
+           . runEngine (runMaybeT (traceColor p (normalize $ p - camPos) objects lights))
+           $ conf
 
 ratio :: ( Num a
          , Fractional a

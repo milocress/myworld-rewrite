@@ -30,6 +30,7 @@ dependencies:
 - JuicyPixels
 - ad
 - reflection
+- transformers
 # - accelerate
 # - linear-accelerate
 # - colour-accelerate

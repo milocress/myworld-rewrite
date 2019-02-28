@@ -30,7 +30,7 @@ myEngine :: EngineConfig FloatPrecision IntPrecision
 myEngine = EngineConfig { maxSteps        = 100
                         , maxDist         = 1000
                         , minDist         = 1e-4
-                        , shadowsEnabled  = False
+                        , shadowsEnabled  = True
                         }
 
 res :: Resolution 2

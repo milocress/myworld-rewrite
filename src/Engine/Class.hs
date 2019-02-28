@@ -88,20 +88,8 @@ type DualMap2 a = Map (V2 a) (a, V3 a)
 
 instance (Floating a, Ord a) => ObjectC (DualMap2 a) a where
   -- | Again, this is an extreme oversimplification
-  sdf p@(V3 x y _) m = sdf p p' where
+  sdf p m = sdf p p' where
     mapAt (V3 a b _) = (V3 a b (fst $ runMap m (V2 a b)))
-    pointCloud point r = promote <$> do
-      r' <- [r, r / 2, r / 32]
-      [
-          point
-        , point + V2 0 r'
-        , point + V2 0 (-r')
-        , point + V2 r' 0
-        , point + V2 (-r') 0
-        ]
-    promote (V2 a b) = (V3 a b 0)
-    z  = fst $ runMap m (V2 x y)
-    -- p' = mapAt <$> pointCloud (V2 x y) z
     p' = mapAt p
 
 instance (Floating a, Ord a) => NormalC (DualMap2 a) a where
