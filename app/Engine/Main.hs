@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module Main where
 
@@ -30,7 +31,7 @@ myEngine = EngineConfig { maxSteps        = 100
                         }
 
 res :: Resolution 2
-res = resolution (1920) (1080)
+res = 100 * resolution (19) (10)
 
 origin :: V3 FloatPrecision
 origin = pure 0
@@ -67,9 +68,14 @@ groundMap = do
       d [ c1, c2, c3
         , d1, d2] = distance (V3 c1 c2 c3) (V3 d1 d2 $ f (V2 d1 d2))
       d _ = error "Internal gradient descent error"
-      nearestPoint (V3 x y z) = toV3 $ gradientDescent d [x, y, z, x, y] !! 20
-      toV3 xs = V3 x y z where [x, y, z] = take 3 xs
+      nearestPoint (V3 x y z) = toV3'' $ gradientDescent d [x, y, z, x, y] !! 1
+      toV3 xs = V3 x y $ f (V2 x y) where [_, _, _, x, y] = xs
+      toV3' xs = V3 x y z where [x, y, z, _, _] = xs
+      toV3'' xs = V3 x y z where [_, _, z, x, y] = xs
   return $ GradMapInfo (f p) g nearestPoint
+         -- $ (\point ->
+         --      let point' = nearestPoint point
+         --      in point' + 2 * (point - point'))
 
 lights :: [PointLight FloatPrecision]
 lights = [ V3 0 0 3
