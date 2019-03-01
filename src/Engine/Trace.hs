@@ -68,11 +68,13 @@ clamp mn mx = max mn . min mx
 shadows :: (_) => V3 a -> V3 a -> MaybeT (Engine a b s) a
 shadows p n = do
   ls <- lift getLights
-  conf <- lift getConfig
+  conf@EngineConfig{..} <- lift getConfig
   state <- lift getState
   return $ average $ do
     l <- ls
-    let shade = runEngine (shadow p n l) conf state
+    let shade = if shadowsEnabled
+          then runEngine (shadow p n l) conf state
+          else 1.0
     return . (* shade)
            . clamp 0 1
            $ dot (normalize $ l - p) n
