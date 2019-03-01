@@ -98,7 +98,7 @@ promote (V2 x y) = V3 x y 0
 
 toDualMap :: (Num a, Floating a, Epsilon a) => GradMap2 a -> DualMap2 a
 toDualMap m = do
-  p@(V2 u v) <- getPoint
+  p <- getPoint
   let (GradMapInfo val g np) = runMap m p
       -- Normal
       dz = g `dot` normalize g
@@ -112,29 +112,13 @@ toDualMap m = do
   return $ DualMapInfo val n np
 {-# INLINE toDualMap #-}
 
--- gradientDescent gw x0 = go x0 fx0 xgx0 0.1 (0 :: Int)
---   where
---     (fx0, xgx0) = gw x0
---     go x fx xgx !eta !i
---       | eta == 0     = [] -- step size is 0
---       | fx1 > fx     = go x fx xgx (eta/2) 0 -- we stepped too far
---       | zeroGrad xgx = [] -- gradient is 0
---       | otherwise    = x1 : if i == 10
---                             then go x1 fx1 xgx1 (eta*2) 0
---                             else go x1 fx1 xgx1 eta (i+1)
---       where
---         zeroGrad = all (\(_,g) -> g == 0)
---         x1 = fmap (\(xi,gxi) -> xi - eta * gxi) xgx
---         (fx1, xgx1) = gw x1
--- {-# INLINE gradientDescent #-}
-
 instance (Floating a, Ord a) => ObjectC (DualMap2 a) a where
   -- | Again, this is an extreme oversimplification
   -- sdf p m = sdf p . getDNearestPoint (runMap m $ demote p) $ p
-  sdf p m = sdf p $ Plane p' getNormal where
+  sdf p m = sdf p $ Plane (getDNearestPoint p) getNormal where
     DualMapInfo{..} = runMap m $ demote p
-    (V3 a b _) = p
-    p' = (V3 a b $ getDValue)
+    -- (V3 a b _) = p
+    -- p' = (V3 a b $ getDValue)
 
 instance (Floating a, Ord a) => NormalC (DualMap2 a) a where
   normal p m = getNormal
