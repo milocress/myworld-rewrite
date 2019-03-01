@@ -36,12 +36,14 @@ traceDist point ray = go 0 0 where
     if dist < minDist
       then return d
       else go (dist + d) (succ n)
+{-# INLINE traceDist #-}
 
 traceRay :: (_)
          => V3 a -> V3 a -> MaybeT (Engine a b s) (V3 a)
 traceRay point ray = do
   d <- traceDist point ray
   return $ point + ray * pure d
+{-# INLINE traceRay #-}
 
 traceColor :: (_)
            => V3 a -> V3 a -> MaybeT (Engine a b s) (V3 c)
@@ -53,12 +55,15 @@ traceColor point ray = do
       c = fromIntegral <$> white
   diffuse <- shadows p n
   return $ floor <$> clamp 0 255 <$> c * pure (ambient + diffuse)
+{-# INLINE traceColor #-}
 
 average :: (Fractional a) => [a] -> a
 average xs = sum xs / genericLength xs
+{-# INLINE average #-}
 
 clamp :: (Ord a) => a -> a -> a -> a
 clamp mn mx = max mn . min mx
+{-# INLINE clamp #-}
 
 shadows :: (_) => V3 a -> V3 a -> MaybeT (Engine a b s) a
 shadows p n = do
@@ -71,6 +76,7 @@ shadows p n = do
     return . (* shade)
            . clamp 0 1
            $ dot (normalize $ l - p) n
+{-# INLINE shadows #-}
 
 shadow :: (_)
        => V3 a -> V3 a -> PointLight a -> Engine a b s a
@@ -80,9 +86,11 @@ shadow point n l = fromMaybe 0.0 <$> (runMaybeT $ do
   p <- traceRay point' (normalize $ l - point')
   cond <- lift $ p `near` l
   return $ if cond then 1.0 else 0.0)
+{-# INLINE shadow #-}
 
 near :: (Floating a, Ord a)
      => V3 a -> V3 a -> Engine a b s Bool
 near v w = do
   EngineConfig{..} <- getConfig
   return $ (abs $ distance v w) <= minDist
+{-# INLINE near #-}

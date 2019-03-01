@@ -7,6 +7,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE BangPatterns #-}
 
 module Engine.Class where
 
@@ -74,11 +75,12 @@ instance NormalC (NormalObject a) a where
 
 data DualMapInfo a = DualMapInfo { getDValue :: a
                                  , getNormal :: V3 a
-                                 , getNearestPoint :: V3 a -> V3 a
+                                 , getDNearestPoint :: V3 a -> V3 a
                                  }
 
 data GradMapInfo a = GradMapInfo { getGValue :: a
                                  , getGrad :: V2 a
+                                 , getGNearestPoint :: V3 a -> V3 a
                                  }
 
 type Map2 a = Map (V2 a) a
@@ -88,24 +90,47 @@ type GradMap2 a = Map (V2 a) (GradMapInfo a)
 
 demote :: V3 a -> V2 a
 demote (V3 x y _) = V2 x y
+{-# INLINE demote #-}
+
 promote :: Num a => V2 a -> V3 a
 promote (V2 x y) = V3 x y 0
+{-# INLINE promote #-}
 
 toDualMap :: (Num a, Floating a, Epsilon a) => GradMap2 a -> DualMap2 a
 toDualMap m = do
   p@(V2 u v) <- getPoint
-  let (GradMapInfo val g) = runMap m p
+  let (GradMapInfo val g np) = runMap m p
+      -- Normal
       dz = g `dot` normalize g
       z  = V3 0 0 1
       g3 = normalize . promote $ g
       n = normalize $ cross
         (g3 + pure dz * z)
         (cross z g3)
-  return $ DualMapInfo val n (const $ V3 u v val)
+      -- Nearest Point
+      -- I got nothing on this. The type system is just killing me
+  return $ DualMapInfo val n np
+{-# INLINE toDualMap #-}
+
+-- gradientDescent gw x0 = go x0 fx0 xgx0 0.1 (0 :: Int)
+--   where
+--     (fx0, xgx0) = gw x0
+--     go x fx xgx !eta !i
+--       | eta == 0     = [] -- step size is 0
+--       | fx1 > fx     = go x fx xgx (eta/2) 0 -- we stepped too far
+--       | zeroGrad xgx = [] -- gradient is 0
+--       | otherwise    = x1 : if i == 10
+--                             then go x1 fx1 xgx1 (eta*2) 0
+--                             else go x1 fx1 xgx1 eta (i+1)
+--       where
+--         zeroGrad = all (\(_,g) -> g == 0)
+--         x1 = fmap (\(xi,gxi) -> xi - eta * gxi) xgx
+--         (fx1, xgx1) = gw x1
+-- {-# INLINE gradientDescent #-}
 
 instance (Floating a, Ord a) => ObjectC (DualMap2 a) a where
   -- | Again, this is an extreme oversimplification
-  sdf p m = sdf p . getNearestPoint (runMap m $ demote p) $ p
+  sdf p m = sdf p . getDNearestPoint (runMap m $ demote p) $ p
 
 instance (Floating a, Ord a) => NormalC (DualMap2 a) a where
   normal p m = getNormal

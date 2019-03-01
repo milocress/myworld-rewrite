@@ -8,7 +8,7 @@ import Linear.V2 (V2 (..))
 import Linear.V3 (V3 (..), cross)
 import Linear.Metric (normalize, dot, distance)
 
-import Numeric.AD (grad)
+import Numeric.AD (grad, gradientDescent)
 
 import Map (getPoint, runMap)
 
@@ -60,39 +60,16 @@ scene = [
 
 groundMap :: GradMap2 FloatPrecision
 groundMap = do
-  p@(V2 u v) <- getPoint
-  let -- Normals
-      f (V2 x y) = 0.1 * (sin (x * 3)) * (sin y) - 0.5
+  p <- getPoint
+  let f (V2 x y) = 0.4 * (sin (x * 3)) * (sin y) - 0.5
       g = grad f p
-      -- dz = g `dot` normalize g
-      -- z  = V3 0 0 1
-      -- g3 = normalize . promote $ g
-      -- promote (V2 a b) = V3 a b 0
-      -- demote (V3 a b _) = V2 a b
-      -- normal = normalize $ cross
-      --   (g3 + pure dz * z)
-      --   (cross z g3)
-      -- Nearest point
-      -- d p3 p2 = distance p3 (promote p2)
-      -- minD p3 = head $ gradientDescent (d p3) (V2 u v)
-      -- minD3 p3 = V3 a b c where
-      --   p'@(V2 a b) = minD p3
-      --   c = f p'
-  return $ GradMapInfo (f p) g
-
--- toDualMap :: Map2 a -> DualMap2 a
--- toDualMap m = do
---   p <- getPoint
---   let f (V2 x y) = runMap m p
---       g  = grad f p
---       dz = g `dot` normalize g
---       z  = V3 0 0 1
---       g3 = normalize . promote $ g
---       promote (V2 a b) = V3 a b 0
---       normal = normalize $ cross
---         (g3 + pure dz * z)
---         (cross z g3)
---   return (f p, normal)
+      -- Minimum Distance
+      d [ c1, c2, c3
+        , d1, d2] = distance (V3 c1 c2 c3) (V3 d1 d2 $ f (V2 d1 d2))
+      d _ = error "Internal gradient descent error"
+      nearestPoint (V3 x y z) = toV3 $ gradientDescent d [x, y, z, x, y] !! 20
+      toV3 xs = V3 x y z where [x, y, z] = take 3 xs
+  return $ GradMapInfo (f p) g nearestPoint
 
 lights :: [PointLight FloatPrecision]
 lights = [ V3 0 0 3
