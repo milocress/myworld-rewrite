@@ -130,7 +130,11 @@ toDualMap m = do
 
 instance (Floating a, Ord a) => ObjectC (DualMap2 a) a where
   -- | Again, this is an extreme oversimplification
-  sdf p m = sdf p . getDNearestPoint (runMap m $ demote p) $ p
+  -- sdf p m = sdf p . getDNearestPoint (runMap m $ demote p) $ p
+  sdf p m = sdf p $ Plane p' getNormal where
+    DualMapInfo{..} = runMap m $ demote p
+    (V3 a b _) = p
+    p' = (V3 a b $ getDValue)
 
 instance (Floating a, Ord a) => NormalC (DualMap2 a) a where
   normal p m = getNormal

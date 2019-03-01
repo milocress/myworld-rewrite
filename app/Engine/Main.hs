@@ -27,11 +27,11 @@ myEngine :: EngineConfig FloatPrecision IntPrecision
 myEngine = EngineConfig { maxSteps        = 100
                         , maxDist         = 1000
                         , minDist         = 1e-4
-                        , shadowsEnabled  = True
+                        , shadowsEnabled  = False
                         }
 
 res :: Resolution 2
-res = 100 * resolution (19) (10)
+res = resolution (1920) (1080)
 
 origin :: V3 FloatPrecision
 origin = pure 0
@@ -69,8 +69,8 @@ groundMap = do
         , d1, d2] = distance (V3 c1 c2 c3) (V3 d1 d2 $ f (V2 d1 d2))
       d _ = error "Internal gradient descent error"
       nearestPoint (V3 x y z) = toV3'' $ gradientDescent d [x, y, z, x, y] !! 1
-      toV3 xs = V3 x y $ f (V2 x y) where [_, _, _, x, y] = xs
-      toV3' xs = V3 x y z where [x, y, z, _, _] = xs
+      -- toV3 xs = V3 x y $ f (V2 x y) where [_, _, _, x, y] = xs
+      -- toV3' xs = V3 x y z where [x, y, z, _, _] = xs
       toV3'' xs = V3 x y z where [_, _, z, x, y] = xs
   return $ GradMapInfo (f p) g nearestPoint
          -- $ (\point ->
