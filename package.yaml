@@ -64,6 +64,11 @@ executables:
     main:                Main.hs
     source-dirs:         app/Engine/
     ghc-options:
+    - -Wall
+    - -Wcompat
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N

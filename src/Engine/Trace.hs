@@ -20,7 +20,7 @@ import Data.Maybe (fromMaybe)
 import Control.Monad.Trans.Maybe (MaybeT, runMaybeT)
 import Control.Monad.Reader (lift)
 
-import Control.Monad.Trans.List (runListT)
+-- import Control.Monad.Trans.List (runListT)
 
 import Data.List (genericLength)
 
@@ -84,7 +84,7 @@ shadow :: (_)
        => V3 a -> V3 a -> PointLight a -> Engine a b s a
 shadow point n l = fromMaybe 0.0 <$> (runMaybeT $ do
   EngineConfig{..} <- lift getConfig
-  let point' = point + n * pure minDist
+  let point' = point + n * pure (100 * minDist)
   p <- traceRay point' (normalize $ l - point')
   cond <- lift $ p `near` l
   return $ if cond then 1.0 else 0.0)

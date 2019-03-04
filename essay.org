@@ -19,7 +19,7 @@
 #+LATEX_HEADER_EXTRA: \usepackage{biblatex}
 #+LATEX_HEADER_EXTRA: \addbibresource{res/bib.bib}
 
-#+LATEX_HEADER_EXTRA: \usepackage[a4paper, width=155mm, top=25mm, bottom=25mm, bindingoffset=0mm]{geometry}
+#+LATEX_HEADER_EXTRA: \usepackage[a4paper, width=180mm, top=25mm, bottom=25mm, bindingoffset=0mm]{geometry}
 
 #+LATEX_HEADER_EXTRA: \usepackage{multicol}
 #+LATEX_HEADER_EXTRA: \setlength{\columnsep}{1cm}
@@ -30,7 +30,7 @@
 #+LATEX_HEADER_EXTRA: \fancyhead[R]{\thepage}
 
 #+LATEX_HEADER_EXTRA: \usepackage{setspace}
-#+LATEX_HEADER_EXTRA: \doublespacing
+# #+LATEX_HEADER_EXTRA: \doublespacing
 
 #+LATEX_COMPILER: pdflatex
 
@@ -53,10 +53,17 @@
   In this article, we present a system for the online rendering of realistic terrain at varying spatial and temporal scales using concurrent functional programming, and leveraging modern multicore computers.
 \end{abstract}
 #+END_EXPORT
+\begin{multicols}{2}
 * Maps
+  \begin{center}
+  Even the galaxy may dream
+  \end{center}
 # \begin{multicols}{2}
   Foundational to the concept of terrain generation is its representation in 3-dimensional space. In cartography, maps provide information about an area of land by translating a given 2-dimensional point to a value. Heightmaps translate latitudes and longitudes to locations in 3-dimensional space by supplying a $z$ coordinate to a given $(x, y)$ coordinate pair. In climatology, "wetmaps" track rainfall over given areas, and predict, given an $(x, y)$ coordinate pair, the inches or centimeters of rain that land on or near than point in a given amount of time. In more complex simulations, vector fields which simulate wind and weather are used by meteorologists to predict the spread of weather events across an area. By encapsulating a tract of land and the forces that act on it as a spatial function, the large-scale calculation of terrain becomes trivial.
 ** Functional programming
+   \begin{center}
+   Every water has its cloud
+   \end{center}
    When speaking about maps, it's easy to imagine them as they are presented in most cartographical texts -- a layering of lines and colors on top of a page. However, attempting to use this model for procedural generation presents two immediate challenges:
    1. We don't know how these maps were created. All we're given is a data dump and assurance of its accuracy. 
    2. We are working in a limited resolution, and therefore must trade scale for level of detail. Since this representation of a map forces the value of every point to be known all at once, one can either know the values of a small range of points with a great degree of detail, or a vast range of points with a limited degree of detail.
@@ -72,22 +79,72 @@
 *** Functors
     Since maps are a parameterized type, they are essentially capable of encapsulating any imaginable value. This allows a map to be described as a function from a point to a value of any type. Functors describe a set of operations for manipulating map values before a map is fully evaluated, or in other words operating on a value encapsulated by a map. This enables complex transformations to be elegantly specified using category theory.
 *** Monads
-    Since monads are merely monoids in the category of endofunctors, envisioning maps as instances of monads unlocks the potential for maps to be described more expressively, and possibly as a composition of other monadic values using Kleisli arrows ($>>=$).
+    Since monads are merely monoids in the category of endofunctors, envisioning maps as instances of monads unlocks the potential for maps to be described more expressively, and possibly as a composition of other monadic values using Kleisli arrows ($>>=$). As a matter of fact, the =Map= monad is simply a wrapper for the =Reader= monad, and inherits =Reader='s instances, including =Monoid= (in the right context), =Functor=, and others.
+    
+    Additionally, monads enable the encapsulation and composition of language features, such as mutable state, input-output (=IO=) actions, non-deterministic computations, and a read-only environment through monad /transformers/. These were applied extensively in the =Engine= module of the codebase, where the =Engine= monad was used in conjunction with the =MaybeT= monad transformer to create a functor with a superset of the monads' features.
 *** Typeclasses
     All of the constructs listed above are examples of =typeclasses=, which specify an interface for a type to implement. When we say that a map is an instance of the typeclass =monoid=, we specify its behavior in certain conditions, and allow the typeclass itself to generalize our definition, and specialize polymorphic functions to our specific type.
 # \end{multicols}
 * Engine
-# \begin{multicols}{2}
+  \begin{center}
+  Power is destruction
+  \end{center}
+  # \begin{multicols}{2}
   Many of the performance and accuracy advantages of procedural geometry generation are negated by "baking" this geometry into the polygonal meshes and rectangular textures required by traditional game engines. During the development of the procedural planet generation software, the author realized that a functional-style engine was necessary to render functional-style maps.
 ** Raytracing
-   Many modern engines employ ray-tracing algorithms to simulate the paths of light in a virtual medium. 
+  \begin{center}
+  Hope is the darkest riddle
+  \end{center}
+   
+   Many modern engines employ ray-tracing algorithms to simulate the paths of light in a virtual medium. A naive implementation of the algorithm might spawn rays of light at a light source, and trace their paths as they interact with the surfaces of the scene, eventually landing on a simulated camera lens. More efficient implementations, however, reverse the process -- spawning rays from the camera and bouncing them off the scene until they reach a light source. This saves the computer from calculating the paths of rays which would have no visible impact on the scene (since a light ray that doesn't interact with the camera is not visible to a viewer).
+   In this section, methods for the efficient calculation of surface-ray interactions are discussed.
 *** Distance estimators
     In order to detect collision between a ray of light and a surface, distance estimators are employed. These algorithms estimate the minimum distance from a given point in 3D space to an object. Distance estimators can be combined and composed to create complex scenes from simple foundational objects.
+    
+    The raymarching algorithm cleverly optimizes the detection of collisions between a ray and a surface. A pseudo-code implementation of the algorithm could be given as follows:
 
-*** Hacking procedural generation
-    Using gradient descent optimization, the minimum distance from a point to a map can be calculated, allowing a 2D map to be placed and rendered in 3D space by our raymarching engine.
+    #+BEGIN_QUOTE
+    for a given starting point $p$, and ray $r$ the function raymarch $(p,r)$ is recursively defined as follows:
 
+    let $d$ equal the minimum distance from $p$ to the scene, as described by the scene's distance estimator.
+
+    let $p'$ equal the point $p$ moved $d$ units in the direction $r$
+
+    if $d$ is less than some predefined minimum distance $d_0$ then return $p'$
+
+    otherwise, return (raymarch $(p',r)$)
+    #+END_QUOTE
+
+    \end{multicols}
+*** Raymarching Maps
+    Using gradient descent optimization, the minimum distance from a point to a map can be calculated, allowing a 2D map to be placed and rendered in 3D space by our raymarching engine. This process is best described by its implementation in the engine:
+
+    #+BEGIN_SRC haskell
+      instance (Floating a, Ord a) => ObjectC (DualMap2 a) a where
+        sdf p m = sdf p $ nearestPoint p m
+        nearestPoint p m = estimateNearestPoints p m e !! 0 where
+          p'@(V2 a b) = demote p
+          e = V3 a b $ getDValue $ runMap m p'
+
+      estimateNearestPoints :: Num a => V3 a -> DualMap2 a -> V3 a -> [V3 a]
+      estimateNearestPoints point mymap estimate = estimate : go point mymap estimate where
+        go p m e = e' : estimateNearestPoints p m e' where
+          e' = betterEstimate p m e
+
+      betterEstimate :: Num a => V3 a -> DualMap2 a -> V3 a -> V3 a
+      betterEstimate p m e = nearestPoint p $ Plane e' getNormal where
+        DualMapInfo{..} = runMap m $ demote e
+        (V3 a b _) = e
+        e' = (V3 a b $ getDValue)
+    #+END_SRC
+
+    The use of gradient descent in this code sample is quite subtle, and lies in a single function application -- =getNormal= -- which, because of the iterative application of =betterEstimate=, causes the nearest point estimate to converge on the point closest to a given =Map=.
+    \begin{multicols}{2}
 ** Lighting
+  \begin{center}
+  Hope is the darkest riddle
+  \end{center}
+
    Light rays interact with surfaces by reflecting off of them. These reflections can be simulated by tracing rays from a viewer to an object, checking for a collision as described above, and coloring each pixel based on the amount of light that pixel reflects. Estimating the reflection of a specific point on an object depends on its /normal/ vector, a unit vector pointing directly away from the object itself:
 
    #+BEGIN_EXPORT latex
@@ -99,13 +156,19 @@
    Where $l$ is the lighting of a point $p$, $r$ is the view vector, and $p'$ is the location of the light.
    
 ** Shadows
-   Realistic scenes require more complex interactions between light and objects, as the above shading system doesn't account for the objects themselves obstructing the path of light rays.
+  \begin{center}
+  Worshipping the fury of the reflections
+  \end{center}
+  Realistic scenes require more complex interactions between light and objects, as the above shading system doesn't account for the objects themselves obstructing the path of light rays.
 *** Hard shadows
     Hard shadows can be calculated by raymarching a point on an object's surface in the direction of its normal, and checking if that ray intersects with an object in the scene.
 *** Soft shadows
     Soft shadows are more complex, as they require area lights, and area lights require a more complex /path tracing/ algorithm to work effectively. They can, however, be estimated, by checking the number of steps required to raymarch to the light source, and shading an area as less lit for each step.
 
 ** Reflections
+  \begin{center}
+  No secret for scattered messengers
+  \end{center}
    Reflections occur when a ray bounces off a surface, and scatters light in a specific direction.
 *** Specular
     Specular reflections give a metallic sheen to an object, and can be combined with diffuse light to create a glossy tint. They are created by raymarching a point in the direction of the incidence vector of a light collision reflected over the point's normal vector using the equation:
@@ -119,11 +182,12 @@
     Diffuse reflections are more complex, but can be obtained by calculating the mean of a distribution of randomly scattered specular reflection rays from a given point. This process is prone to noise, so a powerful denoising algorithm is necessary.
 
 *** Caustics
-    Caustics are the reflection of bright reflections, commonly caused by water or mirrors bouncing off of a diffuse surface. Though these are difficult to simulate without path-tracing, The author is exploring less computationally costly alternatives.
-
-
+    Caustics are a reflection of bright reflections, commonly caused by light reflected from water or mirrors onto a diffuse surface. Though these are difficult to simulate without path-tracing, The author is exploring less computationally costly alternatives.
 # \end{multicols}
 * Optimization
+  \begin{center}
+  Ecstasy comes only through possessing meaning
+  \end{center}
 # \begin{multicols}{2}
   The processes described trade predefined geometry for dynamically calculated geometry, giving the programmer greater power in dynamically modifying the level of detail of a sector at runtime. However, these runtime calculations greatly increase the complexity of the algorithm, which decreases the number of frames that can be rendered in a given unit of time. 
 
@@ -134,6 +198,10 @@
   3. Parallelizing calculations
   
 ** Functional programming
+   \begin{center}
+   A storm in a chronicle
+   \end{center}
+
    Fortunately, the functional model allows compilers to make these kind of optimizations automatically. In this section we'll discuss how these optimizations can be triggered and how they work together to reduce overall computational complexity. 
 *** Deforestation (fusion)
     Recursive processes that build and destroy intermediate data structures, such as /hylomorphisms/ (which are compositions of a anamorphisms and catamorphisms), can often be reduced to a single loop, and controlled by simple rules. For example, the expression: 
@@ -158,7 +226,10 @@
     The lazy evaluation paradigm of Haskell is integral in detecting whether a block of code will be superfluous because it was multiplied by zero, or subtracted from itself. The mathematical guarantee of correctness in these optimizations, coupled with the forward referential transparency ensured by effect-free pure functions enable powerful, high-level optimizations both at runtime and compile time.
 *** Parallelism
     Even code that cannot be optimized can often be easily parallized by using Haskell's robust =parallel= library for concurrent and sequential evaluation.
-** Automatic differentiation
+** Automatic Differentiation
+   \begin{center}
+   Power comes only through washing away destruction
+   \end{center}
    The engine code base, as well as the geographical simulations, make heavy use of normal and gradient vectors, which require the algorithm to determine partial derivatives of maps either numerically or analytically.
 
    Automatic differentiation enables the automatic derivation of partials, allowing the equation:
@@ -185,12 +256,17 @@
 
 *** Reworking code to parameterize types
     Type flexibility enables the polymorphism that allows automatic differentiation to work hand-in-hand with extensible and optimizable typeclasses, such as =Accelerate='s =Num= and =Fractional= classes.
-** GPU - parallelism
+** GPU - Parallelism
+   \begin{center}
+   Man's mind is his spark
+   \end{center}
+
    In order to implement powerful parallelism, specialized hardware is necessary. IBM/MIT fellow John Cohn has had several conversations with the author about the promise of graphics processors as general purpose computers.
 
    "GPUs are increasingly capable of massively parallel computation" \cite{cohn}
 *** Haskell Parallel DSL
-    The =Accelerate= library for Haskell enables polymorphic functions to be compiled to a GPU-optimized Domain-Specific Language (DSL) during runtime.
+    The =Accelerate= library for Haskell enables polymorphic functions to be compiled to a GPU-optimized Domain-Specific Language (DSL) during runtime. Extensive effort was made to generalize the types of the =Engine= module combinators such that they could fall under =Accelerate='s standard typeclass instances. However, it became apparent that any version of the engine or map that would utilize the GPU via Accelerate would require a rewrite of the core libraries, and possibly of these libraries' dependencies, which would be impractical, and beyond the scope of the project.
+
 *** Cuda library
     Mark Engelhardt, a systems engineer and geospatial programmer, stressed the importance of low-level optimization, even in high-level languages such as Haskell. \cite{engelhardt} 
     
@@ -198,6 +274,9 @@
 
 # \end{multicols}
 * TODO To do
+  \begin{center}
+  Boredom makes perfection
+  \end{center}
   # \begin{multicols}{2}
   The project, as its original goals were expressed, is nearing completion. However, some key features remain to be implemented.
 ** Simulation
@@ -216,6 +295,7 @@
 *** Random sampling typeclass for soft shadows and diffuse shading
 
 # \end{multicols}
+\end{multicols}
 * Works Cited
 #+BEGIN_EXPORT latex
 \printbibliography

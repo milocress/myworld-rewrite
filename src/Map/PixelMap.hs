@@ -38,13 +38,11 @@ toImage a = generateImage gen width height
 type PixelMap c = DimensionalMap 2 c RGB8
 
 -- | Evaluates a map to an array
-bakePixelMap :: ( Dim n
-                , Fractional c
-                , SameDimension n DIM2
+bakePixelMap :: ( Fractional c
                 )
-             => Sector n c
-             -> Resolution n
-             -> DimensionalMap n c RGB8
+             => Sector 2 c
+             -> Resolution 2
+             -> DimensionalMap 2 c RGB8
              -> DynamicImage
 bakePixelMap s r m = ImageRGB8 . toImage $ runIdentity $ bakeMap s r m
 
@@ -65,7 +63,6 @@ toGrayScale :: Bool -> RGB8
 toGrayScale True = white
 toGrayScale _    = black
 
-{-# INLINE optimizeMap #-}
 optimizeMap :: ( Fractional c, Enum c, Ord c
                , Eq a, Bounded a
                , Dim n
@@ -90,3 +87,4 @@ optimizeMap m s n = fromSectorMap minBound
          _         -> NodeF (toSectorMap (return $ minBound)     s') childSeeds
   same [] = False
   same (x:xs) = all (x ==) $ xs
+{-# INLINE optimizeMap #-}
