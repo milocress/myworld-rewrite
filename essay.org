@@ -96,8 +96,8 @@
   Hope is the darkest riddle
   \end{center}
    
-   Many modern engines employ ray-tracing algorithms to simulate the paths of light in a virtual medium. A naive implementation of the algorithm might spawn rays of light at a light source, and trace their paths as they interact with the surfaces of the scene, eventually landing on a simulated camera lens. More efficient implementations, however, reverse the process -- spawning rays from the camera and bouncing them off the scene until they reach a light source. This saves the computer from calculating the paths of rays which would have no visible impact on the scene (since a light ray that doesn't interact with the camera is not visible to a viewer).
-   In this section, methods for the efficient calculation of surface-ray interactions are discussed.
+  Many modern engines employ ray-tracing algorithms to simulate the paths of light in a virtual medium. A naive implementation of the algorithm might spawn rays of light at a light source, and trace their paths as they interact with the surfaces of the scene, eventually landing on a simulated camera lens. More efficient implementations, however, reverse the process -- spawning rays from the camera and bouncing them off the scene until they reach a light source. This saves the computer from calculating the paths of rays which would have no visible impact on the scene (since a light ray that doesn't interact with the camera is not visible to a viewer).
+  In this section, methods for the efficient calculation of surface-ray interactions are discussed.
 *** Distance estimators
     In order to detect collision between a ray of light and a surface, distance estimators are employed. These algorithms estimate the minimum distance from a given point in 3D space to an object. Distance estimators can be combined and composed to create complex scenes from simple foundational objects.
     
@@ -182,7 +182,7 @@
     Diffuse reflections are more complex, but can be obtained by calculating the mean of a distribution of randomly scattered specular reflection rays from a given point. This process is prone to noise, so a powerful denoising algorithm is necessary.
 
 *** Caustics
-    Caustics are a reflection of bright reflections, commonly caused by light reflected from water or mirrors onto a diffuse surface. Though these are difficult to simulate without path-tracing, The author is exploring less computationally costly alternatives.
+    Caustics are a reflection of bright reflections, commonly caused by light reflected from water or mirrors onto a diffuse surface. Though these are difficult to simulate without path-tracing the author is exploring less computationally costly alternatives.
 # \end{multicols}
 * Optimization
   \begin{center}
