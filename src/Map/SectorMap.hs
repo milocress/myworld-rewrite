@@ -4,7 +4,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 ------------------------------------------------------
 -- |
--- Module : SectorMap
+-- Module : Map.SectorMap
 -- Maintainer : Milo Cress
 -- Stability : Lol
 -- Portability : portable
@@ -41,6 +41,8 @@ type DimensionalMapT n c m a = MapT (V n c) m a
 -- | Analogous to a 'Map' with parameterized dimensionality,
 --   or a 'DimensionalMap' specialized to the 'Identity' monad.
 type DimensionalMap n c a = DimensionalMapT n c Identity a
+
+-- | Constructs a "DimensionalMap" from a function.
 dimensionalMap :: (V n c -> a) -> DimensionalMap n c a
 dimensionalMap = mkMap
 
@@ -69,7 +71,7 @@ bot <+> top = (+) <$> (top <|> pure 0) <*> (bot <|> pure 0)
 (>>>) = (<|>)
 
 -- | Converts a 'DimensionalMap' to a 'SectorMap' bounded by the
---   input 'Sector'.
+-- input 'Sector'.
 toSectorMap :: (Dim n, Ord c)
             => DimensionalMap n c a
             -> Sector n c
@@ -79,13 +81,17 @@ toSectorMap m s = do
   guard $ inSector s point
   mapMapT (Just . runIdentity) m
 
-fromDimensionalMap :: (Dim n)
-                   => DimensionalMap n c a
+-- | Turns a "DimensionalMap" into a "SectorMap" with an infinite boundary.
+fromDimensionalMap :: DimensionalMap n c a
                    -> SectorMap n c a
 fromDimensionalMap = mapMapT (Just . runIdentity)
 
-fromSectorMap :: a -- ^ Fallback value, should the 'SectorMap' return 'Nothing' at a given point.
-              -> SectorMap n c a -- ^ The 'SectorMap' on which we'll perform the computation.
+-- | Given a fallback value, turns a "SectorMap" into a "DimensionalMap".
+-- The "Map" equivalent of "fromMaybe".
+fromSectorMap :: a -- ^ Fallback value, should the 'SectorMap'
+              -- return 'Nothing' at a given point.
+              -> SectorMap n c a -- ^ The 'SectorMap'
+              -- on which we'll perform the computation.
               -> DimensionalMap n c a -- ^ The resulting n-dimensional map,
               -- which is well-defined at every conceivable point in nD space.
 fromSectorMap fallback = mapMapT $ Identity . fromMaybe fallback
@@ -94,12 +100,18 @@ fromSectorMap fallback = mapMapT $ Identity . fromMaybe fallback
 emptySectorMap :: SectorMap n c a
 emptySectorMap = empty
 
+-- | Evaluates a "sectorMap" to a value wrapped in the "Maybe" monad
 runSectorMap :: SectorMap n c a -> V n c -> Maybe a
 runSectorMap = runMapT
 
+-- | Checks if a given point is inside of a "sectorMap"
 inSectorMap :: SectorMap n c a -> V n c -> Bool
 inSectorMap m = isJust . runSectorMap m
 
+-- | Returns the value of a map at the center of a sector.
+-- Note that the map must be a "DimensionalMap" as
+-- opposed to a "SectorMap" in order for the return value to
+-- be in the identity monad.
 sampleMidpoint :: (Fractional c)
                => DimensionalMap n c a
                -> Sector n c

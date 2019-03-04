@@ -62,6 +62,8 @@ subdivideSector n = sequence . fmap (subdivide n)
 instance (Enum a, Fractional a) => Subdivide (Sector n a) where
   subdivide = subdivideSector
 
+-- | Creates a transform given two sectors such that
+-- | >> runTransform (s `to` s') s == s'
 to :: (Dim n, Fractional a)
    => Sector n a
    -> Sector n a
@@ -69,6 +71,7 @@ to :: (Dim n, Fractional a)
 s `to` t = transform . (<*>) $ to' <$> s <*> t where
   (a, b) `to'` (c, d) = \x -> ((x - a) / (b - a)) * (d - c) + c
 
+-- | Returns the midpoint of an n-dimensional sector
 midpoint :: (Fractional a) => Sector n a -> V n a
 midpoint = fmap mid where
   mid (x, y) = (x + y) / 2

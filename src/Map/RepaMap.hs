@@ -13,14 +13,14 @@
 
 ------------------------------------------------------
 -- |
--- Module : RepaMap
+-- Module : Map.RepaMap
 -- Maintainer : Milo Cress
 -- Stability : Lol
 -- Portability : portable
 --
--- Internal Representation of Maps that can turn into Repa arrays.
+-- Internal representation of Maps that can turn into Repa arrays.
 ------------------------------------------------------
-module Map.RepaMap where
+module Map.RepaMap ( bakeMap ) where
 
 -- import Data.Foldable
 import qualified Data.Array.Repa as R
@@ -40,18 +40,17 @@ import Map.Dimension
 type RepaMapT s m a = MapT s m a
 type RepaMap  s   a = RepaMapT s Identity a
 
-runRepaMapT :: (R.Shape s) => RepaMapT s m a -> s -> m a
+runRepaMapT :: RepaMapT s m a -> s -> m a
 runRepaMapT = runMapT
 
-runRepaMap :: (R.Shape s) => RepaMap s a -> s -> a
+runRepaMap :: RepaMap s a -> s -> a
 runRepaMap = runMap
 
-toArray :: (R.Shape s) => s -> RepaMap s a -> R.Array R.D s a
+toArray :: s -> RepaMap s a -> R.Array R.D s a
 toArray s = R.fromFunction s . runRepaMap
 
 toRepaMap :: ( Fractional c
              , Dim n
-             , SameDimension n sh
              , R.Shape sh
              , Monad m )
           => Sector n c
@@ -62,9 +61,9 @@ toRepaMap s r = changeCoordinates fromShape
               . changeCoordinates (fmap fromIntegral)
               . transformCoordinates ((toSector r) `to` s)
 
+-- | Evaluates a "DimensionalMap" to a 2D "Array" of values.
 bakeMap :: ( Dim n
            , Fractional c
-           , SameDimension n sh
            , Unbox a
            , Monad m
            , R.Shape sh )
@@ -75,13 +74,11 @@ bakeMap :: ( Dim n
 bakeMap s r = R.computeUnboxedP . toArray (toShape r) . toRepaMap s r
 
 toShape :: ( R.Shape sh
-           , SameDimension n sh
            )
         => V n Int -> sh
 toShape = R.shapeOfList . V.toList . toVector
 
 fromShape :: ( R.Shape sh
-             , SameDimension n sh
              )
           => sh
           -> V n Int

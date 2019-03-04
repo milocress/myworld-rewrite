@@ -2,6 +2,16 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE FlexibleContexts #-}
+
+------------------------------------------------------
+-- |
+-- Module : Map.PixelMap
+-- Maintainer : Milo Cress
+-- Stability : Lol
+-- Portability : portable
+--
+-- Internal mechanism for baking 2D images to the disk.
+------------------------------------------------------
 module Map.PixelMap where
 
 import Data.Array.Repa as R
@@ -46,6 +56,7 @@ bakePixelMap :: ( Fractional c
              -> DynamicImage
 bakePixelMap s r m = ImageRGB8 . toImage $ runIdentity $ bakeMap s r m
 
+-- | Writes a "PixelMap" to the disk.
 writePixelMap :: ( Fractional a )
               => FilePath
               -> Resolution 2
@@ -53,16 +64,20 @@ writePixelMap :: ( Fractional a )
               -> IO ()
 writePixelMap p r m = savePngImage p (bakePixelMap (toSector r) r m)
 
+-- | The color black.
 black :: RGB8
 black = V3 0 0 0
 
+-- | The color white.
 white :: RGB8
 white = V3 255 255 255
 
+-- | Maps a boolean value to black or white.
 toGrayScale :: Bool -> RGB8
 toGrayScale True = white
 toGrayScale _    = black
 
+-- | supposedly optimizes a map, but really just makes my computer crash.
 optimizeMap :: ( Fractional c, Enum c, Ord c
                , Eq a, Bounded a
                , Dim n

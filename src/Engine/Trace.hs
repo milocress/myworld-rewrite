@@ -1,7 +1,16 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE FlexibleContexts #-}
-module Engine.Trace where
+------------------------------------------------------
+-- |
+-- Module : Engine.Trace
+-- Maintainer : Milo Cress
+-- Stability : Lol
+-- Portability : who even knows
+--
+-- Internal raytracing engine
+------------------------------------------------------
+module Engine.Trace (traceColor) where
 
 import Engine.Class
 import Engine.Light
@@ -45,6 +54,8 @@ traceRay point ray = do
   return $ point + ray * pure d
 {-# INLINE traceRay #-}
 
+-- | Traces a ray from a given point in a direction of a given ray
+-- to return a color.
 traceColor :: (_)
            => V3 a -> V3 a -> MaybeT (Engine a b s) (V3 c)
 traceColor point ray = do

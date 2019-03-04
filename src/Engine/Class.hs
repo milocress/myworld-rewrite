@@ -9,7 +9,28 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE BangPatterns #-}
 
-module Engine.Class where
+------------------------------------------------------
+-- |
+-- Module : Engine.Class
+-- Maintainer : Milo Cress
+-- Stability : Lol
+-- Portability : who even knows
+--
+-- Typeclasses and instances of internal "Engine" module raymarching helpers, such as minimum distance estimators.
+------------------------------------------------------
+module Engine.Class (
+    ObjectC (..)
+  , NormalC (..)
+  , Object (..)
+  , NormalObject (..)
+  , GradMapInfo (..)
+  -- , GradMapInfo (..)
+  , Map2
+  , GradMap2
+  -- , GradMap2
+  , Sphere (..)
+  , Plane (..)
+  ) where
 
 import Map (Map, runMap, getPoint)
 
@@ -22,11 +43,13 @@ import Data.Function (on)
 
 import Data.List (minimumBy)
 
+-- | A distance-estimated, ray-marchable object defines a "nearestPoint" function
+-- | and a standard minimum distance function
 class ObjectC s a where
   nearestPoint :: V3 a -> s -> V3 a
   sdf :: V3 a -> s -> a
 
-
+-- | "ObjectC" can be extended to describe diffuse light interaction by defining its normal at a given point.
 class ObjectC s a => NormalC s a where
   normal :: ( Floating a
             , Epsilon a
@@ -66,7 +89,9 @@ instance ( ObjectC s a
   sdf p (a, b) = min (sdf p a) (sdf p b)
   nearestPoint p (a, b) = nearestPoint p [nearestPoint p a, nearestPoint p b]
 
+-- | Existential object type for heterogeneous collections
 data Object a = forall s . ObjectC s a => Object s
+-- | Existential normal type for heterogeneous collections
 data NormalObject a = forall s . NormalC s a => NormalObject s
 
 instance ObjectC (Object a) a where
@@ -80,18 +105,21 @@ instance ObjectC (NormalObject a) a where
 instance NormalC (NormalObject a) a where
   normal p (NormalObject o) = normal p o
 
-
 data DualMapInfo a = DualMapInfo { getDValue :: a
                                  , getNormal :: V3 a
                                  }
 
+-- | The "Map" analog of a Dual number, which contains a value and a derivative
 data GradMapInfo a = GradMapInfo { getGValue :: a
                                  , getGrad :: V2 a
                                  }
 
+-- | Type synonym for a 2D map
 type Map2 a = Map (V2 a) a
+
 type DualMap2 a = Map (V2 a) (DualMapInfo a)
 
+-- | "Map2" of Dual numbers
 type GradMap2 a = Map (V2 a) (GradMapInfo a)
 
 demote :: V3 a -> V2 a
@@ -102,7 +130,7 @@ promote :: Num a => V2 a -> V3 a
 promote (V2 x y) = V3 x y 0
 {-# INLINE promote #-}
 
-toDualMap :: (Num a, Floating a, Epsilon a) => GradMap2 a -> DualMap2 a
+toDualMap :: (Floating a, Epsilon a) => GradMap2 a -> DualMap2 a
 toDualMap m = do
   p <- getPoint
   let (GradMapInfo val g) = runMap m p
@@ -122,7 +150,7 @@ instance (Floating a, Ord a) => ObjectC (DualMap2 a) a where
   -- | Again, this is an extreme oversimplification
   -- sdf p m = sdf p . getDNearestPoint (runMap m $ demote p) $ p
   sdf p m = sdf p $ nearestPoint p m
-  nearestPoint p m = e where -- estimateNearestPoints p m e !! 0 where
+  nearestPoint p m = estimateNearestPoints p m e !! 0 where
     p'@(V2 a b) = demote p
     e = V3 a b $ getDValue $ runMap m p'
 
@@ -151,6 +179,7 @@ instance (Floating a, Ord a, Epsilon a) => ObjectC (GradMap2 a) a where
 instance (Floating a, Ord a, Epsilon a) => NormalC (GradMap2 a) a where
   normal p m = normal p (toDualMap m)
 
+-- | Distance estimated, ray-marchable sphere
 data Sphere a = Sphere { sphereRadius :: a
                        , spherePos    :: V3 a
                        }
@@ -163,6 +192,7 @@ instance ( Num a
 instance (Floating a) => NormalC (Sphere a) a where
   normal p Sphere{..} = normalize $ p - spherePos
 
+-- | Distance estimated, ray-marchable plane
 data Plane a = Plane { planePoint  :: V3 a
                      , planeNormal :: V3 a
                      }

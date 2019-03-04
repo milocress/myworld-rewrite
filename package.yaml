@@ -64,6 +64,7 @@ executables:
     main:                Main.hs
     source-dirs:         app/Engine/
     ghc-options:
+    - -fno-warn-partial-type-signatures
     - -Wall
     - -Wcompat
     - -Wincomplete-record-updates

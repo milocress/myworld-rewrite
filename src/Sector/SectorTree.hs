@@ -1,6 +1,16 @@
 -- {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE PolyKinds #-}
+
+------------------------------------------------------
+-- |
+-- Module : Sector.SectorTree
+-- Maintainer : Milo Cress
+-- Stability : Lol
+-- Portability : portable
+--
+-- I'm not sure how usefull this will be.
+------------------------------------------------------
 module Sector.SectorTree where
 
 import Map
@@ -9,10 +19,13 @@ import Map.SectorMap
 -- import Control.Monad
 import Data.Functor.Foldable
 
+-- | The foundational datatype for the "SectorTree", a tree data structure
 data TreeF a r = NodeF a [r] deriving (Functor, Show)
 
+-- | The fixpoint of the data structure
 type Tree a = Fix (TreeF a)
 
+-- | A "Tree" of "Sector"s
 type SectorTree n c a = Tree (SectorMap n c a)
 
 {-# INLINE compileSectorTreeWith #-}

@@ -51,6 +51,7 @@ runMap :: Map c a -- ^ The 'Map' whose attribute we want
        -> a       -- ^ The attribute
 runMap m = runIdentity . runMapT m
 
+-- | Returns the point, which is the Map's read-only environment.
 getPoint :: Monad m => MapT c m c
 getPoint = ask
 
@@ -61,8 +62,9 @@ updateCoordinates :: (Monad m)
                   -> MapT c m a
 updateCoordinates = local
 
-changeCoordinates :: (Monad m)
-                  => (c' -> c)
+-- | Similar to updateCoordinates, but capable of changing the type of the "Map" this essentially facilitates
+-- | changing coordinate systems (from 2- to 3-dimensions, for example).
+changeCoordinates :: (c' -> c)
                   -> MapT c m a
                   -> MapT c' m a
 changeCoordinates = withReaderT
@@ -71,5 +73,7 @@ changeCoordinates = withReaderT
 mapMapT :: (m a -> n b) -> MapT c m a -> MapT c n b
 mapMapT = mapReaderT
 
+-- | Applies a function to the result of a map at a given point
+-- | essentially chains a function to the end of the "Reader" monad.
 mapMap :: (a -> b) -> Map c a -> Map c b
 mapMap = fmap

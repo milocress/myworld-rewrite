@@ -52,6 +52,7 @@ runTransformT = runMap
 runTransform :: Transform a -> a -> a
 runTransform = runMap
 
+-- | Given a transform, updates a map to use the new coordinate system.
 transformCoordinates :: (Monad m)
                      => Transform c
                      -> MapT c m a

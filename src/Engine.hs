@@ -6,11 +6,19 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+
+------------------------------------------------------
+-- |
+-- Module : Engine
+-- Maintainer : Milo Cress
+-- Stability : Lol
+-- Portability : who even knows
+--
+-- It's like a professional raytracer except really slow /and/ low quality!
+------------------------------------------------------
 module Engine ( Object (..)
               , NormalObject (..)
               , Map2
-              , DualMap2
-              , DualMapInfo (..)
               , GradMap2
               , GradMapInfo (..)
               , Camera (..)
@@ -40,6 +48,7 @@ import Control.Monad.Trans.Maybe (runMaybeT)
 
 import Map.PixelMap (black, writePixelMap)
 
+-- | This probably belongs somewhere else. TODO: implement quaternions for objects, make "Camera" an object
 data Camera a = Camera { camFov    :: a            -- ^ angle, in degrees
                        , camPos    :: V3 a
                        , camFacing :: V3 a         -- ^ Normal vector of the camera's face (the direction the camera is facing)
@@ -48,6 +57,7 @@ data Camera a = Camera { camFov    :: a            -- ^ angle, in degrees
                        , camRes    :: Resolution 2 -- ^ resolution
                        }
 
+-- | Renders a scene to the disk.
 renderScene :: (_)
             => EngineConfig a b -> Camera a -> p -> [V3 a] -> FilePath -> IO ()
 renderScene conf cam@Camera{..} objects lights path = writePixelMap path camRes m where
@@ -62,7 +72,7 @@ ratio res = let
   (V2 x y) = fromV $ fromIntegral <$> res
   in y / x
 
-uvToWorld :: ( Floating a, Epsilon a)
+uvToWorld :: (Floating a, Epsilon a)
           => Camera a -> V2 a -> V3 a
 uvToWorld Camera{..} (V2 u v) = camPos
                               + (camFacing * pure camScale)
