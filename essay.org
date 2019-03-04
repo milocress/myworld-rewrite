@@ -19,7 +19,7 @@
 #+LATEX_HEADER_EXTRA: \usepackage{biblatex}
 #+LATEX_HEADER_EXTRA: \addbibresource{res/bib.bib}
 
-#+LATEX_HEADER_EXTRA: \usepackage[a4paper, width=155mm, top=25mm, bottom=25mm, bindingoffset=0mm]{geometry}
+#+LATEX_HEADER_EXTRA: \usepackage[a4paper, width=180mm, top=25mm, bottom=25mm, bindingoffset=0mm]{geometry}
 
 #+LATEX_HEADER_EXTRA: \usepackage{multicol}
 #+LATEX_HEADER_EXTRA: \setlength{\columnsep}{1cm}
@@ -30,7 +30,7 @@
 #+LATEX_HEADER_EXTRA: \fancyhead[R]{\thepage}
 
 #+LATEX_HEADER_EXTRA: \usepackage{setspace}
-#+LATEX_HEADER_EXTRA: \doublespacing
+# #+LATEX_HEADER_EXTRA: \doublespacing
 
 #+LATEX_COMPILER: pdflatex
 
@@ -53,10 +53,17 @@
   In this article, we present a system for the online rendering of realistic terrain at varying spatial and temporal scales using concurrent functional programming, and leveraging modern multicore computers.
 \end{abstract}
 #+END_EXPORT
+\begin{multicols}{2}
 * Maps
+  \begin{center}
+  Even the galaxy may dream
+  \end{center}
 # \begin{multicols}{2}
   Foundational to the concept of terrain generation is its representation in 3-dimensional space. In cartography, maps provide information about an area of land by translating a given 2-dimensional point to a value. Heightmaps translate latitudes and longitudes to locations in 3-dimensional space by supplying a $z$ coordinate to a given $(x, y)$ coordinate pair. In climatology, "wetmaps" track rainfall over given areas, and predict, given an $(x, y)$ coordinate pair, the inches or centimeters of rain that land on or near than point in a given amount of time. In more complex simulations, vector fields which simulate wind and weather are used by meteorologists to predict the spread of weather events across an area. By encapsulating a tract of land and the forces that act on it as a spatial function, the large-scale calculation of terrain becomes trivial.
 ** Functional programming
+   \begin{center}
+   Every water has its cloud
+   \end{center}
    When speaking about maps, it's easy to imagine them as they are presented in most cartographical texts -- a layering of lines and colors on top of a page. However, attempting to use this model for procedural generation presents two immediate challenges:
    1. We don't know how these maps were created. All we're given is a data dump and assurance of its accuracy. 
    2. We are working in a limited resolution, and therefore must trade scale for level of detail. Since this representation of a map forces the value of every point to be known all at once, one can either know the values of a small range of points with a great degree of detail, or a vast range of points with a limited degree of detail.
@@ -77,9 +84,16 @@
     All of the constructs listed above are examples of =typeclasses=, which specify an interface for a type to implement. When we say that a map is an instance of the typeclass =monoid=, we specify its behavior in certain conditions, and allow the typeclass itself to generalize our definition, and specialize polymorphic functions to our specific type.
 # \end{multicols}
 * Engine
-# \begin{multicols}{2}
+  \begin{center}
+  Power is destruction
+  \end{center}
+  # \begin{multicols}{2}
   Many of the performance and accuracy advantages of procedural geometry generation are negated by "baking" this geometry into the polygonal meshes and rectangular textures required by traditional game engines. During the development of the procedural planet generation software, the author realized that a functional-style engine was necessary to render functional-style maps.
 ** Raytracing
+  \begin{center}
+  Hope is the darkest riddle
+  \end{center}
+   
    Many modern engines employ ray-tracing algorithms to simulate the paths of light in a virtual medium. 
 *** Distance estimators
     In order to detect collision between a ray of light and a surface, distance estimators are employed. These algorithms estimate the minimum distance from a given point in 3D space to an object. Distance estimators can be combined and composed to create complex scenes from simple foundational objects.
@@ -88,6 +102,10 @@
     Using gradient descent optimization, the minimum distance from a point to a map can be calculated, allowing a 2D map to be placed and rendered in 3D space by our raymarching engine.
 
 ** Lighting
+  \begin{center}
+  Hope is the darkest riddle
+  \end{center}
+
    Light rays interact with surfaces by reflecting off of them. These reflections can be simulated by tracing rays from a viewer to an object, checking for a collision as described above, and coloring each pixel based on the amount of light that pixel reflects. Estimating the reflection of a specific point on an object depends on its /normal/ vector, a unit vector pointing directly away from the object itself:
 
    #+BEGIN_EXPORT latex
@@ -99,13 +117,19 @@
    Where $l$ is the lighting of a point $p$, $r$ is the view vector, and $p'$ is the location of the light.
    
 ** Shadows
-   Realistic scenes require more complex interactions between light and objects, as the above shading system doesn't account for the objects themselves obstructing the path of light rays.
+  \begin{center}
+  Worshipping the fury of the reflections
+  \end{center}
+  Realistic scenes require more complex interactions between light and objects, as the above shading system doesn't account for the objects themselves obstructing the path of light rays.
 *** Hard shadows
     Hard shadows can be calculated by raymarching a point on an object's surface in the direction of its normal, and checking if that ray intersects with an object in the scene.
 *** Soft shadows
     Soft shadows are more complex, as they require area lights, and area lights require a more complex /path tracing/ algorithm to work effectively. They can, however, be estimated, by checking the number of steps required to raymarch to the light source, and shading an area as less lit for each step.
 
 ** Reflections
+  \begin{center}
+  No secret for scattered messengers
+  \end{center}
    Reflections occur when a ray bounces off a surface, and scatters light in a specific direction.
 *** Specular
     Specular reflections give a metallic sheen to an object, and can be combined with diffuse light to create a glossy tint. They are created by raymarching a point in the direction of the incidence vector of a light collision reflected over the point's normal vector using the equation:
@@ -119,11 +143,12 @@
     Diffuse reflections are more complex, but can be obtained by calculating the mean of a distribution of randomly scattered specular reflection rays from a given point. This process is prone to noise, so a powerful denoising algorithm is necessary.
 
 *** Caustics
-    Caustics are the reflection of bright reflections, commonly caused by water or mirrors bouncing off of a diffuse surface. Though these are difficult to simulate without path-tracing, The author is exploring less computationally costly alternatives.
-
-
+    Caustics are the reflection of bright reflections, commonly caused by light reflected from water or mirrors onto a diffuse surface. Though these are difficult to simulate without path-tracing, The author is exploring less computationally costly alternatives.
 # \end{multicols}
 * Optimization
+  \begin{center}
+  Ecstasy comes only through possessing meaning
+  \end{center}
 # \begin{multicols}{2}
   The processes described trade predefined geometry for dynamically calculated geometry, giving the programmer greater power in dynamically modifying the level of detail of a sector at runtime. However, these runtime calculations greatly increase the complexity of the algorithm, which decreases the number of frames that can be rendered in a given unit of time. 
 
@@ -198,6 +223,9 @@
 
 # \end{multicols}
 * TODO To do
+  \begin{center}
+  Boredom makes perfection
+  \end{center}
   # \begin{multicols}{2}
   The project, as its original goals were expressed, is nearing completion. However, some key features remain to be implemented.
 ** Simulation
@@ -216,6 +244,7 @@
 *** Random sampling typeclass for soft shadows and diffuse shading
 
 # \end{multicols}
+\end{multicols}
 * Works Cited
 #+BEGIN_EXPORT latex
 \printbibliography
