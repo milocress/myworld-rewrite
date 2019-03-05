@@ -47,8 +47,7 @@ traceDist point ray = go 0 0 where
       else go (dist + d) (succ n)
 {-# INLINE traceDist #-}
 
-traceRay :: (_)
-         => V3 a -> V3 a -> MaybeT (Engine a b s) (V3 a)
+traceRay :: (_) => V3 a -> V3 a -> MaybeT (Engine a b s) (V3 a)
 traceRay point ray = do
   d <- traceDist point ray
   return $ point + ray * pure d
@@ -93,17 +92,17 @@ shadows p n = do
 
 shadow :: (_)
        => V3 a -> V3 a -> PointLight a -> Engine a b s a
-shadow point n l = fromMaybe 0.0 <$> (runMaybeT $ do
+shadow point n l = fmap (fromMaybe 0.0) $ runMaybeT $ do
   EngineConfig{..} <- lift getConfig
-  let point' = point + n * pure (100 * minDist)
-  p <- traceRay point' (normalize $ l - point')
-  cond <- lift $ p `near` l
-  return $ if cond then 1.0 else 0.0)
+  let point' = point + n * pure (minDist)
+  p <- traceRay point' (normalize $ l - point)
+  lift (p `near` l) >>= guard
+  return 1.0
 {-# INLINE shadow #-}
 
 near :: (Floating a, Ord a)
      => V3 a -> V3 a -> Engine a b s Bool
 near v w = do
   EngineConfig{..} <- getConfig
-  return $ (abs $ distance v w) <= minDist
+  return $ distance v w <= minDist
 {-# INLINE near #-}

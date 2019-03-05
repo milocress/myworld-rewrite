@@ -141,8 +141,6 @@ toDualMap m = do
       n = normalize $ cross
         (g3 + pure dz * z)
         (cross z g3)
-      -- Nearest Point
-      -- I got nothing on this. The type system is just killing me
   return $ DualMapInfo val n
 {-# INLINE toDualMap #-}
 

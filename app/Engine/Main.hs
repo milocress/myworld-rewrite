@@ -37,8 +37,8 @@ origin :: V3 FloatPrecision
 origin = pure 0
 
 cam :: Camera FloatPrecision
-cam = Camera 90                        -- field of view
-             (V3 0 0 4)                -- position
+cam = Camera 150
+             (V3 (-1) 0 4)                -- position
              (normalize $ V3 1 0 (-1)) -- lookAt
              (normalize $ V3 1 0 1)    -- camUp
              1                         -- scale
@@ -46,17 +46,17 @@ cam = Camera 90                        -- field of view
 
 scene :: [NormalObject FloatPrecision]
 scene = [
-        --   NormalObject $ ( Sphere 0.5 (V3 4 (-1) 0)         :: Sphere FloatPrecision )
-        -- , NormalObject $ ( Sphere 0.1 (V3 3.8 1 0.1)        :: Sphere FloatPrecision )
-        -- , NormalObject $ ( Sphere 0.1 (V3 4 0 0)            :: Sphere FloatPrecision )
-        -- , NormalObject $ ( Plane (V3 5 0 0) (V3 (-1) 0 0)   :: Plane  FloatPrecision )
-        -- , NormalObject $ ( Plane (V3 0 0 (-0.5)) (V3 0 0 1) :: Plane  FloatPrecision )
-        -- , NormalObject $ ( Plane (V3 0 (-2) 0) (V3 0 1 0)   :: Plane  FloatPrecision )
-        -- , NormalObject $ ( Plane (V3 0 2 0) (V3 0 (-1) 0)   :: Plane  FloatPrecision )
-        -- , NormalObject groundMap
-          NormalObject groundMap
+          NormalObject $ ( Sphere 0.5 (V3 4 (-1) 0)         :: Sphere FloatPrecision )
+        , NormalObject $ ( Sphere 0.1 (V3 3.8 1 0.1)        :: Sphere FloatPrecision )
+        , NormalObject $ ( Sphere 0.1 (V3 4 0 0)            :: Sphere FloatPrecision )
+        , NormalObject $ ( Plane (V3 5 0 0) (V3 (-1) 0 0)   :: Plane  FloatPrecision )
+        , NormalObject $ ( Plane (V3 0 0 (-0.5)) (V3 0 0 1) :: Plane  FloatPrecision )
         , NormalObject $ ( Plane (V3 0 (-2) 0) (V3 0 1 0)   :: Plane  FloatPrecision )
         , NormalObject $ ( Plane (V3 0 2 0) (V3 0 (-1) 0)   :: Plane  FloatPrecision )
+        -- , NormalObject groundMap
+        --   NormalObject groundMap
+        -- , NormalObject $ ( Plane (V3 0 (-2) 0) (V3 0 1 0)   :: Plane  FloatPrecision )
+        -- , NormalObject $ ( Plane (V3 0 2 0) (V3 0 (-1) 0)   :: Plane  FloatPrecision )
         ]
 
 groundMap :: GradMap2 FloatPrecision
@@ -65,7 +65,7 @@ groundMap = do
   return $ GradMapInfo (f p) (grad f p)
 
 f :: (Floating a) => V2 a -> a
-f (V2 x y) = 1 * (sin (x * 6)) * (sin (y * 6)) - 0.5
+f (V2 x y) = 0.1 * (sin (x * 3)) * (sin (y * 3)) - 0.5
 
 lights :: [PointLight FloatPrecision]
 lights = [ V3 0 0 3
