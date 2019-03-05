@@ -89,4 +89,3 @@ uvToWorld Camera{..} (V2 u v) = camPos
 toRadians :: ( Fractional a , Floating a )
           => a -> a
 toRadians theta = pi * theta / 180
-
