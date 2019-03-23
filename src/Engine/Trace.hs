@@ -38,8 +38,8 @@ traceDist point ray = go 0 0 where
   go d n = do
     EngineConfig{..} <- lift getConfig
     scene <- lift getScene
-    lights <- lift getLights
-    let dist = sdf (point + pure d * ray) (scene, lights)
+    -- lights <- lift getLights
+    let dist = sdf (point + pure d * ray) scene
     guard $ n < maxSteps
     guard $ dist < maxDist
     if dist < minDist
@@ -92,10 +92,10 @@ shadows p n = do
 
 shadow :: (_)
        => V3 a -> V3 a -> PointLight a -> Engine a b s a
-shadow point n l = fmap (fromMaybe 0.0) $ runMaybeT $ do
+shadow point _ l = fmap (fromMaybe 0.0) $ runMaybeT $ do
   EngineConfig{..} <- lift getConfig
-  let point' = point + n * pure (minDist)
-  p <- traceRay point' (normalize $ l - point)
+  let dir = normalize $ point - l
+  p <- traceRay l dir
   lift (p `near` l) >>= guard
   return 1.0
 {-# INLINE shadow #-}
@@ -104,5 +104,5 @@ near :: (Floating a, Ord a)
      => V3 a -> V3 a -> Engine a b s Bool
 near v w = do
   EngineConfig{..} <- getConfig
-  return $ distance v w <= minDist
+  return $ distance v w <= 100
 {-# INLINE near #-}

@@ -148,7 +148,7 @@ instance (Floating a, Ord a) => ObjectC (DualMap2 a) a where
   -- | Again, this is an extreme oversimplification
   -- sdf p m = sdf p . getDNearestPoint (runMap m $ demote p) $ p
   sdf p m = sdf p $ nearestPoint p m
-  nearestPoint p m = estimateNearestPoints p m e !! 0 where
+  nearestPoint p m = e where -- estimateNearestPoints p m e !! 0 where
     p'@(V2 a b) = demote p
     e = V3 a b $ getDValue $ runMap m p'
 
